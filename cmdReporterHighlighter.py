@@ -26,13 +26,31 @@ import keyword
 from PySide import QtGui, QtCore
 from maya import cmds
 
+
 def getMayaWindowWidget():
 	"get maya window widget for Qt"
 	mwin = None
 	mapp = QtGui.QApplication.instance()
 	for widget in mapp.topLevelWidgets():
-		if widget.objectName() = 'MayaWindow':
+		if widget.objectName() == 'MayaWindow':
 			mwin = widget
 			break
 	return mwin
-			
+
+class Highlighter(QtGui.QSyntaxHighlighter):
+	"""syntax highlighter"""
+	def __init__(self, parent=None):
+		super(Highlighter, self).__init__(parent)
+		
+		self.__rules = []
+		
+	def _keywordFormat(self):
+		'''set up keyword format'''
+		melKeywords = []
+		pyKeywords = keyword.kwlist + ['False', 'True', 'None']
+		# keyword format
+		keywordFormat = QtGui.QTextCharFormat()
+		keywordFormat.setForeground(QtCore.Qt.darkBlue)
+		keywordFormat.setFontWeight(QtGui.QFont.Bold)
+		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), keywordFormat) for 
+						keyword in pyKeywords + melKeywords]
