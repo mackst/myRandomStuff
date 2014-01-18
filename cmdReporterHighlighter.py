@@ -110,6 +110,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		with open(cmdsList) as phile:
 			[functions.append(line.split(' ')[0]) for line in phile]
 			
+		# global MEL procedures
+		functions += cmds.melInfo()
+		
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
 		funcFormat.setForeground(QtCore.Qt.darkBlue)
