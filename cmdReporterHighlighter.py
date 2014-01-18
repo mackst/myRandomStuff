@@ -52,9 +52,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
 		mapiFormat.setForeground(QtCore.Qt.darkBlue)
-		self.__rules.append((QtCore.QRegExp('\\bM\w+\\b'), mapiFormat))
+		self.__rules.append((QtCore.QRegExp('\\bM\\w+\\b'), mapiFormat))
 		# Qt 
-		self.__rules.append((QtCore.QRegExp('\\bQ\w+\\b'), mapiFormat))
+		self.__rules.append((QtCore.QRegExp('\\bQ\\w+\\b'), mapiFormat))
 		
 		# sing line comment
 		self._commentFormat = QtGui.QTextCharFormat()
@@ -72,6 +72,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self.__rules.append((QtCore.QRegExp('".*"')))
 		# single quotes for python: ''
 		self.__rules.append((QtCore.QRegExp("'.*'")))
+		
+		# function and class format
+		funcFormat = QtGui.QTextCharFormat()
+		funcFormat.setFontWeight(QtGui.QFont.Bold)
+		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):')))
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
