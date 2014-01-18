@@ -49,10 +49,18 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self._keywordFormat()
 		self._cmdsFunctionFormat()
 		
-		# maya api keyword format
+		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
 		mapiFormat.setForeground(QtCore.Qt.darkBlue)
 		self.__rules.append((QtCore.QRegExp('\\bM\w+'), mapiFormat))
+		# Qt 
+		self.__rules.append((QtCore.QRegExp('\\bQ\w+'), mapiFormat))
+		
+		# // mel comment
+		singLineMelComment = QtGui.QTextCharFormat()
+		# orange red
+		singLineMelComment.setForeground(QtGui.QColor('#FFFF4500'))
+		self.__rules.append((QtCore.QRegExp('//[^\n]*'), singLineMelComment))
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
