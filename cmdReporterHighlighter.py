@@ -79,9 +79,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):')))
 		
 		# blocks: start : end
-		self._blockRegexp = {QtCore.QRegExp('/\\*') : QtCore.QRegExp('\\*/'), 
-							QtCore.QRegExp('"""\\*') : QtCore.QRegExp('\\*"""'), 
-							QtCore.QRegExp("'''\\*") : QtCore.QRegExp("\\*'''")}
+		self._blockRegexp = {
+							# mel multi-line comment: /*  */
+							QtCore.QRegExp('/\\*') : QtCore.QRegExp('\\*/'),
+							# python  multi-line string: """   """
+							QtCore.QRegExp('"""\\*') : QtCore.QRegExp('\\*"""'),
+							# python  multi-line string: '''   ''' 
+							QtCore.QRegExp("'''\\*") : QtCore.QRegExp("\\*'''"), 
+							}
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
@@ -112,6 +117,12 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 			
 		# global MEL procedures
 		functions += cmds.melInfo()
+		
+		# TODO: should update it when a plug-in was load.
+		# function from plug-ins
+		plugins = cmds.pluginInfo(q=1, listPlugins=1)
+		for plugin in plugins:
+			functions += cmds.pluginInfo(plugin, q=1, command=1)
 		
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
