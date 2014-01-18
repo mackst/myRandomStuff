@@ -131,10 +131,28 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 						keyword in functions]
 		
 	def highlightBlock(self, text):
+		'''highlight text'''
 		for pattern, tformat in self.__rules:
 			index = pattern.indexIn(text)
 			while index >= 0:
 				length = pattern.matchedLength()
 				self.setFormat(index, length, tformat)
 				index = pattern.indexIn(text, index + length)
-		pass
+		
+		# blocks
+		textLength = len(text)
+		for startBlock in self._blockRegexp:
+			startIndex = 0
+			if self.previousBlockState() != 1:
+				startIndex = startBlock.indexIn(text)
+				
+			while startIndex >= 0:
+				endIndex = self._blockRegexp[startBlock].indexIn(text, startIndex)
+				if endIndex == -1:
+					self.setCurrentBlockState(1)
+					blockLength = textLength - startIndex
+				else:
+					blockLength = endIndex - startIndex + self._blockRegexp[startBlock].matchedLength()
+					
+				self.setFormat(startIndex, blockLength, self._commentFormat)
+				startIndex = startBlock.indexIn(text, startIndex + blockLength)
