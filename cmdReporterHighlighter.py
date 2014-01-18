@@ -130,3 +130,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), funcFormat) for 
 						keyword in functions]
 		
+	def highlightBlock(self, text):
+		for pattern, tformat in self.__rules:
+			index = pattern.indexIn(text)
+			while index >= 0:
+				length = pattern.matchedLength()
+				self.setFormat(index, length, tformat)
+				index = pattern.indexIn(text, index + length)
+		pass
