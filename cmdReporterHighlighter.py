@@ -78,6 +78,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		funcFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):')))
 		
+		# blocks: start : end
+		self._blockRegexp = {QtCore.QRegExp('/\\*') : QtCore.QRegExp('\\*/'), 
+							QtCore.QRegExp('"""\\*') : QtCore.QRegExp('\\*"""'), 
+							QtCore.QRegExp("'''\\*") : QtCore.QRegExp("\\*'''")}
+		
 	def _keywordFormat(self):
 		'''set up keyword format'''
 		# mel keyword
