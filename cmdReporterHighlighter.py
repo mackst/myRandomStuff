@@ -46,11 +46,19 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
-		melKeywords = []
+		# mel keyword
+		melKeywords = ['false', 'float', 'int', 'matrix', 'off', 'on', 'string', 
+					'true', 'vector', 'yes', 'alias', 'case', 'catch', 'break', 
+					'case', 'continue', 'default', 'do', 'else', 'for', 'if', 'in', 
+					'while', 'alias', 'case', 'catch', 'global', 'proc', 'return', 'source', 'switch']
+		# python keyword
 		pyKeywords = keyword.kwlist + ['False', 'True', 'None']
+		
+		keywords = {}.fromkeys(melKeywords)
+		keywords.update({}.fromkeys(pyKeywords))
 		# keyword format
 		keywordFormat = QtGui.QTextCharFormat()
 		keywordFormat.setForeground(QtCore.Qt.darkBlue)
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), keywordFormat) for 
-						keyword in pyKeywords + melKeywords]
+						keyword in keywords]
