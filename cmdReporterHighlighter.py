@@ -56,11 +56,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# Qt 
 		self.__rules.append((QtCore.QRegExp('\\bQ\w+'), mapiFormat))
 		
-		# // mel comment
-		singLineMelComment = QtGui.QTextCharFormat()
+		# sing line comment
+		singLineComment = QtGui.QTextCharFormat()
 		# orange red
-		singLineMelComment.setForeground(QtGui.QColor('#FFFF4500'))
-		self.__rules.append((QtCore.QRegExp('//[^\n]*'), singLineMelComment))
+		singLineComment.setForeground(QtGui.QColor('#FFFF4500'))
+		# // mel comment
+		self.__rules.append((QtCore.QRegExp('//[^\n]*'), singLineComment))
+		# # python comment
+		self.__rules.append((QtCore.QRegExp('#[^\n]*'), singLineComment))
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
