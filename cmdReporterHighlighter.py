@@ -21,6 +21,8 @@
 # IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import sys
+import os
 import keyword
 
 from PySide import QtGui, QtCore
@@ -44,6 +46,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 		self.__rules = []
 		
+		self._keywordFormat()
+		self._cmdsFunctionFormat()
+		
+		# maya api keyword format
+		mapiFormat = QtGui.QTextCharFormat()
+		mapiFormat.setForeground(QtCore.Qt.darkBlue)
+		self.__rules.append((QtCore.QRegExp('\\bM\w+'), mapiFormat))
+		
 	def _keywordFormat(self):
 		'''set up keyword format'''
 		# mel keyword
@@ -62,3 +72,18 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), keywordFormat) for 
 						keyword in keywords]
+		
+	def _cmdsFunctionFormat(self):
+		'''set up maya.cmds functions'''
+		mayaBinDir = os.path.dirname(sys.executable)
+		cmdsList = os.path.join(mayaBinDir, 'commandList')
+		functions = []
+		with open(cmdsList) as phile:
+			[functions.append(line.split(' ')[0]) for line in phile]
+			
+		# function format
+		funcFormat = QtGui.QTextCharFormat()
+		funcFormat.setForeground(QtCore.Qt.darkBlue)
+		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), funcFormat) for 
+						keyword in functions]
+		
