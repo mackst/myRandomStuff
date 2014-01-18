@@ -52,18 +52,26 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
 		mapiFormat.setForeground(QtCore.Qt.darkBlue)
-		self.__rules.append((QtCore.QRegExp('\\bM\w+'), mapiFormat))
+		self.__rules.append((QtCore.QRegExp('\\bM\w+\\b'), mapiFormat))
 		# Qt 
-		self.__rules.append((QtCore.QRegExp('\\bQ\w+'), mapiFormat))
+		self.__rules.append((QtCore.QRegExp('\\bQ\w+\\b'), mapiFormat))
 		
 		# sing line comment
-		singLineComment = QtGui.QTextCharFormat()
+		self._commentFormat = QtGui.QTextCharFormat()
 		# orange red
-		singLineComment.setForeground(QtGui.QColor('#FFFF4500'))
+		self._commentFormat.setForeground(QtGui.QColor('#FFFF4500'))
 		# // mel comment
-		self.__rules.append((QtCore.QRegExp('//[^\n]*'), singLineComment))
+		self.__rules.append((QtCore.QRegExp('//[^\n]*'), self._commentFormat))
 		# # python comment
-		self.__rules.append((QtCore.QRegExp('#[^\n]*'), singLineComment))
+		self.__rules.append((QtCore.QRegExp('#[^\n]*'), self._commentFormat))
+		
+		# quotation
+		self._quotationFormat = QtGui.QTextCharFormat()
+		self._quotationFormat.setForeground(QtCore.Qt.green)
+		# quote: ""
+		self.__rules.append((QtCore.QRegExp('".*"')))
+		# single quotes for python: ''
+		self.__rules.append((QtCore.QRegExp("'.*'")))
 		
 	def _keywordFormat(self):
 		'''set up keyword format'''
