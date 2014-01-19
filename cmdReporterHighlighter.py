@@ -30,7 +30,7 @@ from maya import cmds
 
 
 def getMayaWindowWidget():
-	"get maya window widget for Qt"
+	'''get maya window widget for Qt'''
 	mwin = None
 	mapp = QtGui.QApplication.instance()
 	for widget in mapp.topLevelWidgets():
@@ -38,6 +38,13 @@ def getMayaWindowWidget():
 			mwin = widget
 			break
 	return mwin
+
+def highlightCmdReporter():
+	'''find cmdScrollFieldReporter1 and highlight it'''
+	mwin = getMayaWindowWidget()
+	cmdReporter = mwin.findChild(QtGui.QTextEdit, 'cmdScrollFieldReporter1')
+	highlighter = Highlighter(parent=mwin)
+	highlighter.setDocument(cmdReporter.document())
 
 class Highlighter(QtGui.QSyntaxHighlighter):
 	"""syntax highlighter"""
@@ -114,8 +121,8 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		keywordFormat = QtGui.QTextCharFormat()
 		keywordFormat.setForeground(QtCore.Qt.darkBlue)
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), keywordFormat) for 
-						keyword in keywords]
+		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % word), keywordFormat) for 
+						word in keywords]
 		
 	def _cmdsFunctionFormat(self):
 		'''set up maya.cmds functions'''
@@ -132,7 +139,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# function from plug-ins
 		plugins = cmds.pluginInfo(q=1, listPlugins=1)
 		for plugin in plugins:
-			functions += cmds.pluginInfo(plugin, q=1, command=1)
+			funcFromPlugin = cmds.pluginInfo(plugin, q=1, command=1)
+			if funcFromPlugin:
+				functions.extend(funcFromPlugin)
 		
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
