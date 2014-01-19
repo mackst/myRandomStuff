@@ -60,7 +60,8 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self._keywordColor = QtGui.QColor(0, 128, 255)
 		
 		self._keywordFormat()
-		self._cmdsFunctionFormat()
+		# too slow need disable it
+		#self._cmdsFunctionFormat()
 		
 		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
