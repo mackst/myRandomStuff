@@ -56,12 +56,15 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 		self.__rules = []
 		
+		# keywords color
+		self._keywordColor = QtGui.QColor(0, 128, 255)
+		
 		self._keywordFormat()
 		self._cmdsFunctionFormat()
 		
 		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
-		mapiFormat.setForeground(QtCore.Qt.darkBlue)
+		mapiFormat.setForeground(self._keywordColor)
 		self.__rules.append((QtCore.QRegExp('\\bM\\w+\\b'), mapiFormat))
 		# Qt 
 		self.__rules.append((QtCore.QRegExp('\\bQ\\w+\\b'), mapiFormat))
@@ -124,7 +127,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		keywords.update({}.fromkeys(pyKeywords))
 		# keyword format
 		keywordFormat = QtGui.QTextCharFormat()
-		keywordFormat.setForeground(QtCore.Qt.blue)
+		keywordFormat.setForeground(self._keywordColor)
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % word), keywordFormat) for 
 						word in keywords]
@@ -150,7 +153,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
-		funcFormat.setForeground(QtCore.Qt.darkBlue)
+		funcFormat.setForeground(self._keywordColor)
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % func), funcFormat) for 
 						func in functions]
 		
