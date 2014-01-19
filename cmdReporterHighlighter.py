@@ -98,11 +98,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# blocks: start : end
 		self._blockRegexp = {
 							# mel multi-line comment: /*  */
-							QtCore.QRegExp('/\\*') : QtCore.QRegExp('\\*/'),
+							'/\\*' : '\\*/',
 							# python  multi-line string: """   """
-							QtCore.QRegExp('"""\\*') : QtCore.QRegExp('\\*"""'),
+							'"""\\*' : '\\*"""',
 							# python  multi-line string: '''   ''' 
-							QtCore.QRegExp("'''\\*") : QtCore.QRegExp("\\*'''"), 
+							"'''\\*" : "\\*'''", 
 							}
 		
 	def _keywordFormat(self):
