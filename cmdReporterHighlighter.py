@@ -65,43 +65,43 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# maya api format
 		mapiFormat = QtGui.QTextCharFormat()
 		mapiFormat.setForeground(self._keywordColor)
-		self.__rules.append((QtCore.QRegExp('\\bM\\w+\\b'), mapiFormat))
+		self.__rules.append(('\\bM\\w+\\b', mapiFormat))
 		# Qt 
-		self.__rules.append((QtCore.QRegExp('\\bQ\\w+\\b'), mapiFormat))
+		self.__rules.append(('\\bQ\\w+\\b', mapiFormat))
 		
 		# sing line comment
 		self._commentFormat = QtGui.QTextCharFormat()
 		# orange red
 		self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
 		# // mel comment
-		self.__rules.append((QtCore.QRegExp('//[^\n]*'), self._commentFormat))
+		self.__rules.append(('//[^\n]*', self._commentFormat))
 		# # python comment
-		self.__rules.append((QtCore.QRegExp('#[^\n]*'), self._commentFormat))
+		self.__rules.append(('#[^\n]*', self._commentFormat))
 		
 		# quotation
 		self._quotationFormat = QtGui.QTextCharFormat()
 		self._quotationFormat.setForeground(QtCore.Qt.green)
 		# quote: ""
-		self.__rules.append((QtCore.QRegExp('".*"'), self._quotationFormat))
+		self.__rules.append(('".*"', self._quotationFormat))
 		# single quotes for python: ''
-		self.__rules.append((QtCore.QRegExp("'.*'"), self._quotationFormat))
+		self.__rules.append(("'.*'", self._quotationFormat))
 		
 		# function and class format
 		funcFormat = QtGui.QTextCharFormat()
 		funcFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):'), funcFormat))
+		self.__rules.append(('\\b(\\w+)\(.*\):', funcFormat))
 		
 		# mel warning
 		warningFormat = QtGui.QTextCharFormat()
 		warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
 		warningFormat.setBackground(QtCore.Qt.yellow)
 		warningFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append((QtCore.QRegExp('// Warning:[^\n]*'), warningFormat))
+		self.__rules.append(('// Warning:[^\n]*', warningFormat))
 		
 		# mel error
 		errorFormat = QtGui.QTextCharFormat()
 		errorFormat.setBackground(QtCore.Qt.red)
-		self.__rules.append((QtCore.QRegExp('// Error:[^\n]*'), errorFormat))
+		self.__rules.append(('// Error:[^\n]*', errorFormat))
 		
 		# blocks: start : end
 		self._blockRegexp = {
@@ -129,7 +129,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		keywordFormat = QtGui.QTextCharFormat()
 		keywordFormat.setForeground(self._keywordColor)
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % word), keywordFormat) for 
+		self.__rules += [('\\b%s\\b' % word, keywordFormat) for 
 						word in keywords]
 		
 	def _cmdsFunctionFormat(self):
@@ -154,17 +154,18 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
 		funcFormat.setForeground(self._keywordColor)
-		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % func), funcFormat) for 
+		self.__rules += [('\\b%s\\b' % func, funcFormat) for 
 						func in functions]
 		
 	def highlightBlock(self, text):
 		'''highlight text'''
 		for pattern, tformat in self.__rules:
-			index = pattern.indexIn(text)
+			regExp = QtCore.QRegExp(pattern)
+			index = regExp.indexIn(text)
 			while index >= 0:
-				length = pattern.matchedLength()
+				length = regExp.matchedLength()
 				self.setFormat(index, length, tformat)
-				index = pattern.indexIn(text, index + length)
+				index = regExp.indexIn(text, index + length)
 		
 		# blocks
 		textLength = len(text)
