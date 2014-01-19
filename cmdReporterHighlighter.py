@@ -96,12 +96,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
 		warningFormat.setBackground(QtCore.Qt.yellow)
 		warningFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append(('// Warning:[^\n]*', warningFormat))
+		self.__rules.append(('// Warning:[^\n]*//', warningFormat))
 		
 		# mel error
 		errorFormat = QtGui.QTextCharFormat()
+		errorFormat.setForeground(QtGui.QColor('#FF9ACD32'))
 		errorFormat.setBackground(QtCore.Qt.red)
-		self.__rules.append(('// Error:[^\n]*', errorFormat))
+		errorFormat.setFontWeight(QtGui.QFont.Bold)
+		self.__rules.append(('// Error:[^\n]*//', errorFormat))
 		
 		# blocks: start : end
 		self._blockRegexp = {
