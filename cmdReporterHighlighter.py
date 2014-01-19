@@ -40,9 +40,12 @@ def getMayaWindowWidget():
 	return mwin
 
 def highlightCmdReporter():
-	'''find cmdScrollFieldReporter1 and highlight it'''
+	'''find cmdScrollFieldReporter and highlight it'''
 	mwin = getMayaWindowWidget()
-	cmdReporter = mwin.findChild(QtGui.QTextEdit, 'cmdScrollFieldReporter1')
+	cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
+	if not cmdReporters: return
+	# only setup for the first one
+	cmdReporter = mwin.findChild(QtGui.QTextEdit, cmdReporters[0])
 	highlighter = Highlighter(parent=mwin)
 	highlighter.setDocument(cmdReporter.document())
 
@@ -66,7 +69,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# sing line comment
 		self._commentFormat = QtGui.QTextCharFormat()
 		# orange red
-		self._commentFormat.setForeground(QtGui.QColor('#FFFFA500'))
+		self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
 		# // mel comment
 		self.__rules.append((QtCore.QRegExp('//[^\n]*'), self._commentFormat))
 		# # python comment
