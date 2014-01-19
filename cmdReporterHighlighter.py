@@ -66,7 +66,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# sing line comment
 		self._commentFormat = QtGui.QTextCharFormat()
 		# orange red
-		self._commentFormat.setForeground(QtGui.QColor('#FFFF4500'))
+		self._commentFormat.setForeground(QtGui.QColor('#FFFFA500'))
 		# // mel comment
 		self.__rules.append((QtCore.QRegExp('//[^\n]*'), self._commentFormat))
 		# # python comment
@@ -87,7 +87,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 		# mel warning
 		warningFormat = QtGui.QTextCharFormat()
+		warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
 		warningFormat.setBackground(QtCore.Qt.yellow)
+		warningFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules.append((QtCore.QRegExp('// Warning:[^\n]*'), warningFormat))
 		
 		# mel error
@@ -119,7 +121,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		keywords.update({}.fromkeys(pyKeywords))
 		# keyword format
 		keywordFormat = QtGui.QTextCharFormat()
-		keywordFormat.setForeground(QtCore.Qt.darkBlue)
+		keywordFormat.setForeground(QtCore.Qt.blue)
 		keywordFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % word), keywordFormat) for 
 						word in keywords]
@@ -146,8 +148,8 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# function format
 		funcFormat = QtGui.QTextCharFormat()
 		funcFormat.setForeground(QtCore.Qt.darkBlue)
-		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % keyword), funcFormat) for 
-						keyword in functions]
+		self.__rules += [(QtCore.QRegExp('\\b%s\\b' % func), funcFormat) for 
+						func in functions]
 		
 	def highlightBlock(self, text):
 		'''highlight text'''
