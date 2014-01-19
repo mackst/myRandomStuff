@@ -76,14 +76,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		self._quotationFormat = QtGui.QTextCharFormat()
 		self._quotationFormat.setForeground(QtCore.Qt.green)
 		# quote: ""
-		self.__rules.append((QtCore.QRegExp('".*"')))
+		self.__rules.append((QtCore.QRegExp('".*"'), self._quotationFormat))
 		# single quotes for python: ''
-		self.__rules.append((QtCore.QRegExp("'.*'")))
+		self.__rules.append((QtCore.QRegExp("'.*'"), self._quotationFormat))
 		
 		# function and class format
 		funcFormat = QtGui.QTextCharFormat()
 		funcFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):')))
+		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):'), funcFormat))
 		
 		# mel warning
 		warningFormat = QtGui.QTextCharFormat()
@@ -98,11 +98,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		# blocks: start : end
 		self._blockRegexp = {
 							# mel multi-line comment: /*  */
-							'/\\*' : '\\*/',
+							'/\\*' : ('\\*/', self._commentFormat),
 							# python  multi-line string: """   """
-							'"""\\*' : '\\*"""',
+							'"""\\*' : ('\\*"""', self._quotationFormat),
 							# python  multi-line string: '''   ''' 
-							"'''\\*" : "\\*'''", 
+							"'''\\*" : ("\\*'''", self._quotationFormat), 
 							}
 		
 	def _keywordFormat(self):
@@ -160,18 +160,22 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		
 		# blocks
 		textLength = len(text)
+		blockIndex = 1
 		for startBlock in self._blockRegexp:
 			startIndex = 0
-			if self.previousBlockState() != 1:
-				startIndex = startBlock.indexIn(text)
+			startRegExp = QtCore.QRegExp(startBlock)
+			endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
+			if self.previousBlockState() != blockIndex:
+				startIndex = startRegExp.indexIn(text)
 				
 			while startIndex >= 0:
-				endIndex = self._blockRegexp[startBlock].indexIn(text, startIndex)
+				endIndex = endRegExp.indexIn(text, startIndex)
 				if endIndex == -1:
-					self.setCurrentBlockState(1)
+					self.setCurrentBlockState(blockIndex)
 					blockLength = textLength - startIndex
 				else:
-					blockLength = endIndex - startIndex + self._blockRegexp[startBlock].matchedLength()
+					blockLength = endIndex - startIndex + endRegExp.matchedLength()
 					
-				self.setFormat(startIndex, blockLength, self._commentFormat)
-				startIndex = startBlock.indexIn(text, startIndex + blockLength)
+				self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
+				startIndex = startRegExp.indexIn(text, startIndex + blockLength)
+			blockIndex += 1
