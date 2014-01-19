@@ -78,6 +78,16 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 		funcFormat.setFontWeight(QtGui.QFont.Bold)
 		self.__rules.append((QtCore.QRegExp('\\b(\\w+)\(.*\):')))
 		
+		# mel warning
+		warningFormat = QtGui.QTextCharFormat()
+		warningFormat.setBackground(QtCore.Qt.yellow)
+		self.__rules.append((QtCore.QRegExp('// Warning:[^\n]*'), warningFormat))
+		
+		# mel error
+		errorFormat = QtGui.QTextCharFormat()
+		errorFormat.setBackground(QtCore.Qt.red)
+		self.__rules.append((QtCore.QRegExp('// Error:[^\n]*'), errorFormat))
+		
 		# blocks: start : end
 		self._blockRegexp = {
 							# mel multi-line comment: /*  */
