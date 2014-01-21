@@ -1,19 +1,19 @@
-#-*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 
 # The MIT License (MIT)
-# 
+#
 # Copyright (c) 2014 Mack Stone
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
 # the Software without restriction, including without limitation the rights to
 # use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
 # the Software, and to permit persons to whom the Software is furnished to do so,
 # subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 # FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -23,7 +23,7 @@
 
 # How to use it
 # open script editor and run
-# 
+#
 # import cmdReporterHighlighter as crHighlighter
 # crHighlighter.highlightCmdReporter()
 
@@ -36,164 +36,164 @@ from maya import cmds
 
 
 def getMayaWindowWidget():
-	'''get maya window widget for Qt'''
-	mwin = None
-	mapp = QtGui.QApplication.instance()
-	for widget in mapp.topLevelWidgets():
-		if widget.objectName() == 'MayaWindow':
-			mwin = widget
-			break
-	return mwin
+    '''get maya window widget for Qt'''
+    mwin = None
+    mapp = QtGui.QApplication.instance()
+    for widget in mapp.topLevelWidgets():
+        if widget.objectName() == 'MayaWindow':
+            mwin = widget
+            break
+    return mwin
 
 def highlightCmdReporter():
-	'''find cmdScrollFieldReporter and highlight it'''
-	mwin = getMayaWindowWidget()
-	cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
-	if not cmdReporters: return
-	# only setup for the first one
-	cmdReporter = mwin.findChild(QtGui.QTextEdit, cmdReporters[0])
-	highlighter = Highlighter(parent=mwin)
-	highlighter.setDocument(cmdReporter.document())
+    '''find cmdScrollFieldReporter and highlight it'''
+    mwin = getMayaWindowWidget()
+    cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
+    if not cmdReporters: return
+    # only setup for the first one
+    cmdReporter = mwin.findChild(QtGui.QTextEdit, cmdReporters[0])
+    highlighter = Highlighter(parent=mwin)
+    highlighter.setDocument(cmdReporter.document())
 
 class Highlighter(QtGui.QSyntaxHighlighter):
-	"""syntax highlighter"""
-	def __init__(self, parent=None):
-		super(Highlighter, self).__init__(parent)
-		
-		self.__rules = []
-		
-		# keywords color
-		self._keywordColor = QtGui.QColor(0, 128, 255)
-		
-		self._keywordFormat()
-		# too slow need disable it
-		#self._cmdsFunctionFormat()
-		
-		# maya api format
-		mapiFormat = QtGui.QTextCharFormat()
-		mapiFormat.setForeground(self._keywordColor)
-		self.__rules.append(('\\bM\\w+\\b', mapiFormat))
-		# Qt 
-		self.__rules.append(('\\bQ\\w+\\b', mapiFormat))
-		
-		# sing line comment
-		self._commentFormat = QtGui.QTextCharFormat()
-		# orange red
-		self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
-		# // mel comment
-		self.__rules.append(('//[^\n]*', self._commentFormat))
-		# # python comment
-		self.__rules.append(('#[^\n]*', self._commentFormat))
-		
-		# quotation
-		self._quotationFormat = QtGui.QTextCharFormat()
-		self._quotationFormat.setForeground(QtCore.Qt.green)
-		# quote: ""
-		self.__rules.append(('".*"', self._quotationFormat))
-		# single quotes for python: ''
-		self.__rules.append(("'.*'", self._quotationFormat))
-		
-		# function and class format
-		funcFormat = QtGui.QTextCharFormat()
-		funcFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append(('\\b(\\w+)\(.*\):', funcFormat))
-		
-		# mel warning
-		warningFormat = QtGui.QTextCharFormat()
-		warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
-		warningFormat.setBackground(QtCore.Qt.yellow)
-		warningFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append(('// Warning:[^\n]*//', warningFormat))
-		
-		# mel error
-		errorFormat = QtGui.QTextCharFormat()
-		errorFormat.setForeground(QtGui.QColor('#FF9ACD32'))
-		errorFormat.setBackground(QtCore.Qt.red)
-		errorFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules.append(('// Error:[^\n]*//', errorFormat))
-		
-		# blocks: start : end
-		self._blockRegexp = {
-							# mel multi-line comment: /*  */
-							'/\\*' : ('\\*/', self._commentFormat),
-							# python  multi-line string: """   """
-							'"""\\*' : ('\\*"""', self._quotationFormat),
-							# python  multi-line string: '''   ''' 
-							"'''\\*" : ("\\*'''", self._quotationFormat), 
-							}
-		
-	def _keywordFormat(self):
-		'''set up keyword format'''
-		# mel keyword
-		melKeywords = ['false', 'float', 'int', 'matrix', 'off', 'on', 'string', 
-					'true', 'vector', 'yes', 'alias', 'case', 'catch', 'break', 
-					'case', 'continue', 'default', 'do', 'else', 'for', 'if', 'in', 
-					'while', 'alias', 'case', 'catch', 'global', 'proc', 'return', 'source', 'switch']
-		# python keyword
-		pyKeywords = keyword.kwlist + ['False', 'True', 'None']
-		
-		keywords = {}.fromkeys(melKeywords)
-		keywords.update({}.fromkeys(pyKeywords))
-		# keyword format
-		keywordFormat = QtGui.QTextCharFormat()
-		keywordFormat.setForeground(self._keywordColor)
-		keywordFormat.setFontWeight(QtGui.QFont.Bold)
-		self.__rules += [('\\b%s\\b' % word, keywordFormat) for 
-						word in keywords]
-		
-	def _cmdsFunctionFormat(self):
-		'''set up maya.cmds functions'''
-		mayaBinDir = os.path.dirname(sys.executable)
-		cmdsList = os.path.join(mayaBinDir, 'commandList')
-		functions = []
-		with open(cmdsList) as phile:
-			[functions.append(line.split(' ')[0]) for line in phile]
-			
-		# global MEL procedures
-		functions += cmds.melInfo()
-		
-		# TODO: should update it when a plug-in was load.
-		# function from plug-ins
-		plugins = cmds.pluginInfo(q=1, listPlugins=1)
-		for plugin in plugins:
-			funcFromPlugin = cmds.pluginInfo(plugin, q=1, command=1)
-			if funcFromPlugin:
-				functions.extend(funcFromPlugin)
-		
-		# function format
-		funcFormat = QtGui.QTextCharFormat()
-		funcFormat.setForeground(self._keywordColor)
-		self.__rules += [('\\b%s\\b' % func, funcFormat) for 
-						func in functions]
-		
-	def highlightBlock(self, text):
-		'''highlight text'''
-		for pattern, tformat in self.__rules:
-			regExp = QtCore.QRegExp(pattern)
-			index = regExp.indexIn(text)
-			while index >= 0:
-				length = regExp.matchedLength()
-				self.setFormat(index, length, tformat)
-				index = regExp.indexIn(text, index + length)
-		
-		# blocks
-		textLength = len(text)
-		blockIndex = 1
-		for startBlock in self._blockRegexp:
-			startIndex = 0
-			startRegExp = QtCore.QRegExp(startBlock)
-			endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
-			if self.previousBlockState() != blockIndex:
-				startIndex = startRegExp.indexIn(text)
-				
-			while startIndex >= 0:
-				endIndex = endRegExp.indexIn(text, startIndex)
-				if endIndex == -1:
-					self.setCurrentBlockState(blockIndex)
-					blockLength = textLength - startIndex
-				else:
-					blockLength = endIndex - startIndex + endRegExp.matchedLength()
-					
-				self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
-				startIndex = startRegExp.indexIn(text, startIndex + blockLength)
-			blockIndex += 1
+    """syntax highlighter"""
+    def __init__(self, parent=None):
+        super(Highlighter, self).__init__(parent)
+
+        self.__rules = []
+
+        # keywords color
+        self._keywordColor = QtGui.QColor(0, 128, 255)
+
+        self._keywordFormat()
+        # too slow need disable it
+        # self._cmdsFunctionFormat()
+
+        # maya api format
+        mapiFormat = QtGui.QTextCharFormat()
+        mapiFormat.setForeground(self._keywordColor)
+        self.__rules.append(('\\bM\\w+\\b', mapiFormat))
+        # Qt
+        self.__rules.append(('\\bQ\\w+\\b', mapiFormat))
+
+        # sing line comment
+        self._commentFormat = QtGui.QTextCharFormat()
+        # orange red
+        self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
+        # // mel comment
+        self.__rules.append(('//[^\n]*', self._commentFormat))
+        # # python comment
+        self.__rules.append(('#[^\n]*', self._commentFormat))
+
+        # quotation
+        self._quotationFormat = QtGui.QTextCharFormat()
+        self._quotationFormat.setForeground(QtCore.Qt.green)
+        # quote: ""
+        self.__rules.append(('".*"', self._quotationFormat))
+        # single quotes for python: ''
+        self.__rules.append(("'.*'", self._quotationFormat))
+
+        # function and class format
+        funcFormat = QtGui.QTextCharFormat()
+        funcFormat.setFontWeight(QtGui.QFont.Bold)
+        self.__rules.append(('\\b(\\w+)\(.*\):', funcFormat))
+
+        # mel warning
+        warningFormat = QtGui.QTextCharFormat()
+        warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
+        warningFormat.setBackground(QtCore.Qt.yellow)
+        warningFormat.setFontWeight(QtGui.QFont.Bold)
+        self.__rules.append(('// Warning:[^\n]*//', warningFormat))
+
+        # mel error
+        errorFormat = QtGui.QTextCharFormat()
+        errorFormat.setForeground(QtGui.QColor('#FF9ACD32'))
+        errorFormat.setBackground(QtCore.Qt.red)
+        errorFormat.setFontWeight(QtGui.QFont.Bold)
+        self.__rules.append(('// Error:[^\n]*//', errorFormat))
+
+        # blocks: start : end
+        self._blockRegexp = {
+                            # mel multi-line comment: /*  */
+                            '/\\*' : ('\\*/', self._commentFormat),
+                            # python  multi-line string: """   """
+                            '"""\\*' : ('\\*"""', self._quotationFormat),
+                            # python  multi-line string: '''   '''
+                            "'''\\*" : ("\\*'''", self._quotationFormat),
+                            }
+
+    def _keywordFormat(self):
+        '''set up keyword format'''
+        # mel keyword
+        melKeywords = ['false', 'float', 'int', 'matrix', 'off', 'on', 'string',
+                    'true', 'vector', 'yes', 'alias', 'case', 'catch', 'break',
+                    'case', 'continue', 'default', 'do', 'else', 'for', 'if', 'in',
+                    'while', 'alias', 'case', 'catch', 'global', 'proc', 'return', 'source', 'switch']
+        # python keyword
+        pyKeywords = keyword.kwlist + ['False', 'True', 'None']
+
+        keywords = {}.fromkeys(melKeywords)
+        keywords.update({}.fromkeys(pyKeywords))
+        # keyword format
+        keywordFormat = QtGui.QTextCharFormat()
+        keywordFormat.setForeground(self._keywordColor)
+        keywordFormat.setFontWeight(QtGui.QFont.Bold)
+        self.__rules += [('\\b%s\\b' % word, keywordFormat) for
+                        word in keywords]
+
+    def _cmdsFunctionFormat(self):
+        '''set up maya.cmds functions'''
+        mayaBinDir = os.path.dirname(sys.executable)
+        cmdsList = os.path.join(mayaBinDir, 'commandList')
+        functions = []
+        with open(cmdsList) as phile:
+            [functions.append(line.split(' ')[0]) for line in phile]
+
+        # global MEL procedures
+        functions += cmds.melInfo()
+
+        # TODO: should update it when a plug-in was load.
+        # function from plug-ins
+        plugins = cmds.pluginInfo(q=1, listPlugins=1)
+        for plugin in plugins:
+            funcFromPlugin = cmds.pluginInfo(plugin, q=1, command=1)
+            if funcFromPlugin:
+                functions.extend(funcFromPlugin)
+
+        # function format
+        funcFormat = QtGui.QTextCharFormat()
+        funcFormat.setForeground(self._keywordColor)
+        self.__rules += [('\\b%s\\b' % func, funcFormat) for
+                        func in functions]
+
+    def highlightBlock(self, text):
+        '''highlight text'''
+        for pattern, tformat in self.__rules:
+            regExp = QtCore.QRegExp(pattern)
+            index = regExp.indexIn(text)
+            while index >= 0:
+                length = regExp.matchedLength()
+                self.setFormat(index, length, tformat)
+                index = regExp.indexIn(text, index + length)
+
+        # blocks
+        textLength = len(text)
+        blockIndex = 1
+        for startBlock in self._blockRegexp:
+            startIndex = 0
+            startRegExp = QtCore.QRegExp(startBlock)
+            endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
+            if self.previousBlockState() != blockIndex:
+                startIndex = startRegExp.indexIn(text)
+
+            while startIndex >= 0:
+                endIndex = endRegExp.indexIn(text, startIndex)
+                if endIndex == -1:
+                    self.setCurrentBlockState(blockIndex)
+                    blockLength = textLength - startIndex
+                else:
+                    blockLength = endIndex - startIndex + endRegExp.matchedLength()
+
+                self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
+                startIndex = startRegExp.indexIn(text, startIndex + blockLength)
+            blockIndex += 1
