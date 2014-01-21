@@ -29,6 +29,7 @@
 
 import sys
 import os
+import re
 import keyword
 
 from PySide import QtGui, QtCore
@@ -114,13 +115,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
         # blocks: start : end
         self._blockRegexp = {
-                            # mel multi-line comment: /*  */
-                            '/\\*' : ('\\*/', self._commentFormat),
-                            # python  multi-line string: """   """
                             '"""\\*' : ('\\*"""', self._quotationFormat),
                             # python  multi-line string: '''   '''
                             "'''\\*" : ("\\*'''", self._quotationFormat),
                             }
+
+        # mel multi-line comment: /*  */
+        self._melMLComStart = re.compile('/\\*')
+        self._melMLComEnd = re.compile('\\*/')
 
     def _keywordFormat(self):
         '''set up keyword format'''
@@ -166,6 +168,31 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         self.__rules += [('\\b%s\\b' % func, funcFormat) for
                         func in functions]
 
+    def _melMLCommentFormat(self, text):
+        '''set up mel multi-line comment: /*  */'''
+        startIndex = 0
+        commentLen = 0
+        self.setCurrentBlockState(0)
+        if self.previousBlockState() != 1:
+            searchStart = self._melMLComStart.search(text)
+            if searchStart:
+                startIndex = searchStart.start()
+                searchEnd = self._melMLComEnd.search(text)
+                if searchEnd:
+                    commentLen = searchEnd.end() - startIndex
+                else:
+                    self.setCurrentBlockState(1)
+                    commentLen = len(text) - startIndex
+        else:
+            searchEnd = self._melMLComEnd.search(text)
+            if searchEnd:
+                commentLen = searchEnd.end()
+            else:
+                self.setCurrentBlockState(1)
+                commentLen = len(text)
+        if commentLen > 0:
+            self.setFormat(startIndex, commentLen, self._commentFormat)
+
     def highlightBlock(self, text):
         '''highlight text'''
         for pattern, tformat in self.__rules:
@@ -177,23 +204,24 @@ class Highlighter(QtGui.QSyntaxHighlighter):
                 index = regExp.indexIn(text, index + length)
 
         # blocks
-        textLength = len(text)
-        blockIndex = 1
-        for startBlock in self._blockRegexp:
-            startIndex = 0
-            startRegExp = QtCore.QRegExp(startBlock)
-            endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
-            if self.previousBlockState() != blockIndex:
-                startIndex = startRegExp.indexIn(text)
-
-            while startIndex >= 0:
-                endIndex = endRegExp.indexIn(text, startIndex)
-                if endIndex == -1:
-                    self.setCurrentBlockState(blockIndex)
-                    blockLength = textLength - startIndex
-                else:
-                    blockLength = endIndex - startIndex + endRegExp.matchedLength()
-
-                self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
-                startIndex = startRegExp.indexIn(text, startIndex + blockLength)
-            blockIndex += 1
+        self._melMLCommentFormat(text)
+#         textLength = len(text)
+#         blockIndex = 1
+#         for startBlock in self._blockRegexp:
+#             startIndex = 0
+#             startRegExp = QtCore.QRegExp(startBlock)
+#             endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
+#             if self.previousBlockState() != blockIndex:
+#                 startIndex = startRegExp.indexIn(text)
+#
+#             while startIndex >= 0:
+#                 endIndex = endRegExp.indexIn(text, startIndex)
+#                 if endIndex == -1:
+#                     self.setCurrentBlockState(blockIndex)
+#                     blockLength = textLength - startIndex
+#                 else:
+#                     blockLength = endIndex - startIndex + endRegExp.matchedLength()
+#
+#                 self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
+#                 startIndex = startRegExp.indexIn(text, startIndex + blockLength)
+#             blockIndex += 1
