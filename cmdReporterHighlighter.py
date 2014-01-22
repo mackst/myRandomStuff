@@ -77,6 +77,14 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         # Qt
         self.__rules.append(('\\bQ\\w+\\b', mapiFormat))
 
+        # quotation
+        self._quotationFormat = QtGui.QTextCharFormat()
+        self._quotationFormat.setForeground(QtCore.Qt.green)
+        # quote: ""
+        self.__rules.append(('".*"', self._quotationFormat))
+        # single quotes for python: ''
+        self.__rules.append(("'.*'", self._quotationFormat))
+
         # sing line comment
         self._commentFormat = QtGui.QTextCharFormat()
         # orange red
@@ -85,14 +93,6 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         self.__rules.append(('//[^\n]*', self._commentFormat))
         # # python comment
         self.__rules.append(('#[^\n]*', self._commentFormat))
-
-        # quotation
-        self._quotationFormat = QtGui.QTextCharFormat()
-        self._quotationFormat.setForeground(QtCore.Qt.green)
-        # quote: ""
-        self.__rules.append(('".*"', self._quotationFormat))
-        # single quotes for python: ''
-        self.__rules.append(("'.*'", self._quotationFormat))
 
         # function and class format
         funcFormat = QtGui.QTextCharFormat()
@@ -205,23 +205,21 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
         # blocks
         self._melMLCommentFormat(text)
-#         textLength = len(text)
-#         blockIndex = 1
-#         for startBlock in self._blockRegexp:
-#             startIndex = 0
-#             startRegExp = QtCore.QRegExp(startBlock)
-#             endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
-#             if self.previousBlockState() != blockIndex:
-#                 startIndex = startRegExp.indexIn(text)
-#
-#             while startIndex >= 0:
-#                 endIndex = endRegExp.indexIn(text, startIndex)
-#                 if endIndex == -1:
-#                     self.setCurrentBlockState(blockIndex)
-#                     blockLength = textLength - startIndex
-#                 else:
-#                     blockLength = endIndex - startIndex + endRegExp.matchedLength()
-#
-#                 self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
-#                 startIndex = startRegExp.indexIn(text, startIndex + blockLength)
-#             blockIndex += 1
+        textLength = len(text)
+        for startBlock in self._blockRegexp:
+            startIndex = 0
+            startRegExp = QtCore.QRegExp(startBlock)
+            endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
+            if self.previousBlockState() != 1:
+                startIndex = startRegExp.indexIn(text)
+
+            while startIndex >= 0:
+                endIndex = endRegExp.indexIn(text, startIndex)
+                if endIndex == -1:
+                    self.setCurrentBlockState(1)
+                    blockLength = textLength - startIndex
+                else:
+                    blockLength = endIndex - startIndex + endRegExp.matchedLength()
+
+                self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
+                startIndex = startRegExp.indexIn(text, startIndex + blockLength)
