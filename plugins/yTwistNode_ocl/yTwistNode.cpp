@@ -270,8 +270,13 @@ unsigned int /*multiIndex*/)
         iter.reset();
         for (; !iter.isDone(); iter.next()) {
             MPoint pt = iter.position();
+            #if defined(__GNUC__)
+            pt.x = outPos[i].x;
+            pt.z = outPos[i].z;
+            #else
             pt.x = outPos[i].s[0];
             pt.z = outPos[i].s[2];
+            #endif
             iter.setPosition(pt);
             i++;
         }
