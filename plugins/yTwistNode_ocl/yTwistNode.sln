@@ -1,0 +1,22 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yTwistNode", "yTwistNode.vcxproj", "{81E3D1FA-C047-8180-F155-CBC13B1D45C7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+		ReleaseDebug|x64 = ReleaseDebug|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.Debug|x64.ActiveCfg = Debug|x64
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.Debug|x64.Build.0 = Debug|x64
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.Release|x64.ActiveCfg = Release|x64
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.Release|x64.Build.0 = Release|x64
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.ReleaseDebug|x64.ActiveCfg = ReleaseDebug|x64
+		{81E3D1FA-C047-8180-F155-CBC13B1D45C7}.ReleaseDebug|x64.Build.0 = ReleaseDebug|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
