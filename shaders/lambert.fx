@@ -88,7 +88,7 @@ float4 pShader(SHADERDATA IN) : COLOR
     float3 worldNormal = normalize(IN.worldNormal);
     float3 lightDir = normalize(-lightDirection);
     
-    float3 lambert = saturate(dot(lightDir, worldNormal));
+    float lambert = saturate(dot(lightDir, worldNormal));
     
     outColor.rgb = diffuseColor * (ambientColor + lambert);
     outColor.a = 1.0f;
