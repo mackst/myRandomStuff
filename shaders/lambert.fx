@@ -22,47 +22,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 
-//------------------------------------
-// Per Frame parameters
-//------------------------------------
-cbuffer UpdatePerFrame : register(b0)
-{
-    float4x4 viewPrj       : ViewProjection    < string UIWidget = "None"; >;
-    float4x4 viewInverse   : ViewInverse         < string UIWidget = "None"; >;
-    bool IsSwatchRender    : MayaSwatchRender  < string UIWidget = "None"; > = false;
 
-    // If the user enables viewport gamma correction in Maya's global viewport rendering 
-    // settings, the shader should not do gamma again
-    bool MayaFullScreenGamma : MayaGammaCorrection < string UIWidget = "None"; > = false;
-}
+float4x4 world                 : World                   < string UIWidget = "None"; >;
+float4x4 wvp                   : WorldViewProjection     < string UIWidget = "None"; >;
+float4x4 worldInverseTranspose : WorldInverseTranspose   < string UIWidget = "None"; >;
 
-//------------------------------------
-// Per Object parameters
-//------------------------------------
-cbuffer UpdatePerObject : register(b1)
-{
-    float4x4 world                 : World                   < string UIWidget = "None"; >;
-    float4x4 wvp                   : WorldViewProjection     < string UIWidget = "None"; >;
-    float4x4 worldInverseTranspose : WorldInverseTranspose   < string UIWidget = "None"; >;
-    
-    // parameters section
-    float3 diffuseColor : Diffuse
-    <
-        string UIName = "Diffuse Color";
-    > = {1.0f, 1.0f, 1.0f};
-    
-    float3 ambientColor : Diffuse
-    <
-        string UIName = "Ambient Color";
-    > = {0.1f, 0.1f, 0.1f};
-    
-    // light direction
-    float3 lightDirection : Direction
-    <
-        string UIName = "Light Direction";
-        string Space = "World"; // using world space
-    > = {0.0f, 1.0f, 0.0f};
-}
+// parameters section
+float3 diffuseColor : Diffuse
+<
+    string UIName = "Diffuse Color";
+> = {1.0f, 1.0f, 1.0f};
+
+float3 ambientColor : Diffuse
+<
+    string UIName = "Ambient Color";
+> = {0.1f, 0.1f, 0.1f};
+
+// light direction
+float3 lightDirection : Direction
+<
+    string UIName = "Light Direction";
+    string Space = "World"; // using world space
+> = {0.0f, 1.0f, 0.0f};
+
 
 
 //------------------------------------
