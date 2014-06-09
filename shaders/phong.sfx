@@ -1,0 +1,731 @@
+SFX_WIN
+Version=26
+GroupVersion=-1.0
+Advanced=0
+HelpID=0
+NumberOfNodes=50
+#NT=20011 0
+	PC=5
+	name=1 v=5000 ambientColor
+	posx=1 v=2003 -8.22696
+	posy=1 v=2003 456.792
+	color=2 e=0 v=3003 0.15,0.15,0.15,1.0
+	defineinheader=2 e=0 v=2001 1
+	group=-1
+	ISC=0
+	OSC=6
+		SVT=5001 3003 1 
+		CC=0
+		SVT=5001 3002 2 
+		CC=1
+			C=0 1 2 10 1 2 0
+			CPC=0
+		SVT=5001 2003 3 
+		CC=0
+		SVT=5001 2003 4 
+		CC=0
+		SVT=5001 2003 5 
+		CC=0
+		SVT=5001 2003 6 
+		CC=0
+#NT=20011 0
+	PC=5
+	name=1 v=5000 diffuseColor
+	posx=1 v=2003 218.919
+	posy=1 v=2003 584.086
+	color=2 e=0 v=3003 0.7,0.7,0.7,1.0
+	defineinheader=2 e=0 v=2001 1
+	group=-1
+	ISC=0
+	OSC=6
+		SVT=5001 3003 1 
+		CC=0
+		SVT=5001 3002 2 
+		CC=1
+			C=1 1 2 11 1 2 0
+			CPC=0
+		SVT=5001 2003 3 
+		CC=0
+		SVT=5001 2003 4 
+		CC=0
+		SVT=5001 2003 5 
+		CC=0
+		SVT=5001 2003 6 
+		CC=0
+#NT=20152 0
+	PC=3
+	posx=1 v=2003 -1137.52
+	posy=1 v=2003 186.268
+	exposesetting=1 v=2001 1
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 5017 1 
+		CC=1
+			C=2 0 1 3 0 1 0
+			CPC=0
+#NT=20153 0
+	PC=2
+	posx=1 v=2003 -957.462
+	posy=1 v=2003 178.106
+	group=-1
+	ISC=1
+		SVT=5001 5017 1 0 0 
+	OSC=1
+		SVT=2002 2002 2 
+		CC=1
+			C=3 0 2 21 0 1 0
+			CPC=0
+#NT=20008 0
+	PC=2
+	posx=1 v=2003 1426.02
+	posy=1 v=2003 476.882
+	group=-1
+	ISC=2
+		SVT=5001 3003 1 0 0 
+		SVT=5001 2003 3 0 0 
+	OSC=1
+		SVT=5001 5009 2 
+		CC=1
+			C=4 0 2 6 4 5 0
+			CPC=0
+#NT=20002 0
+	PC=3
+	posx=1 v=2003 1815.1
+	posy=1 v=2003 421.024
+	techniquename=1 v=5000 sample
+	group=-1
+	ISC=1
+		SVT=5001 5004 1 0 0 
+	OSC=1
+		SVT=5001 5003 2 
+		CC=1
+			C=5 0 2 15 2 2 0
+			CPC=0
+#NT=20003 0
+	PC=2
+	posx=1 v=2003 1597.39
+	posy=1 v=2003 345.687
+	group=-1
+	ISC=7
+		SVT=5001 5014 1 0 0 
+		SVT=5001 5005 2 0 0 
+		SVT=5001 5007 3 0 0 
+		SVT=5001 5008 4 0 0 
+		SVT=5001 5009 5 0 0 
+		SVT=5001 5011 7 0 0 
+		SVT=5001 5011 8 0 0 
+	OSC=1
+		SVT=5001 5004 6 
+		CC=1
+			C=6 0 6 5 0 1 0
+			CPC=0
+#NT=20021 0
+	PC=3
+	name=1 v=5000 worldNormal
+	posx=1 v=2003 -418.934
+	posy=1 v=2003 424.399
+	group=-1
+	ISC=1
+		SVT=5001 3002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=3
+			C=7 0 2 8 1 2 0
+			CPC=0
+			C=7 0 2 35 1 2 0
+			CPC=0
+			C=7 0 2 43 1 2 0
+			CPC=0
+#NT=20018 0
+	PC=2
+	posx=1 v=2003 -166.521
+	posy=1 v=2003 299.326
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=8 0 3 9 0 1 0
+			CPC=0
+#NT=20023 0
+	PC=3
+	name=1 v=5000 lambert
+	posx=1 v=2003 46.0805
+	posy=1 v=2003 317.918
+	group=-1
+	ISC=1
+		SVT=5001 2003 1 0 0 
+	OSC=1
+		SVT=5001 2003 2 
+		CC=2
+			C=9 0 2 10 0 1 0
+			CPC=0
+			C=9 0 2 42 1 2 0
+			CPC=0
+#NT=20026 0
+	PC=2
+	posx=1 v=2003 229.671
+	posy=1 v=2003 398.507
+	group=-1
+	ISC=2
+		SVT=5001 2003 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=10 0 3 11 0 1 0
+			CPC=0
+#NT=20016 0
+	PC=3
+	name=1 v=5000 color
+	posx=1 v=2003 579.112
+	posy=1 v=2003 469.62
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=11 0 3 41 0 1 0
+			CPC=0
+#NT=20020 0
+	PC=3
+	name=1 v=5000 outColor
+	posx=1 v=2003 1244.96
+	posy=1 v=2003 434.18
+	group=-1
+	ISC=6
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+		SVT=5001 3001 3 0 0 
+		SVT=5001 2003 4 0 0 
+		SVT=5001 3002 5 0 0 
+		SVT=5001 2003 6 0 0 
+	OSC=3
+		SVT=5001 3001 7 
+		CC=0
+		SVT=5001 3002 8 
+		CC=0
+		SVT=5001 3003 9 
+		CC=1
+			C=12 2 9 4 0 1 0
+			CPC=0
+#NT=20017 0
+	PC=2
+	posx=1 v=2003 1042.45
+	posy=1 v=2003 622.125
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 2003 1 
+		CC=1
+			C=13 0 1 12 5 6 0
+			CPC=0
+#NT=20112 0
+	PC=2
+	posx=1 v=2003 -573.904
+	posy=1 v=2003 245.866
+	group=-1
+	ISC=1
+		SVT=5001 3002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=1
+			C=14 0 2 16 0 1 0
+			CPC=0
+#NT=20001 0
+	PC=4
+	posx=1 v=2003 1998.16
+	posy=1 v=2003 404.127
+	config=2 e=0 v=5012 1
+	saveshadertodisk=2 e=0 v=5015 
+	group=-1
+	ISC=3
+		SVT=2002 2002 3 0 0 
+		SVT=5001 5016 1 0 0 
+		SVT=5001 5003 2 0 0 
+	OSC=0
+#NT=20021 0
+	PC=3
+	name=1 v=5000 lightDir
+	posx=1 v=2003 -363.199
+	posy=1 v=2003 266.582
+	group=-1
+	ISC=1
+		SVT=5001 3002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=2
+			C=16 0 2 8 0 1 0
+			CPC=0
+			C=16 0 2 45 1 2 0
+			CPC=0
+#NT=20014 0
+	PC=2
+	posx=1 v=2003 -1008.71
+	posy=1 v=2003 389.682
+	group=-1
+	ISC=0
+	OSC=2
+		SVT=5001 3003 1 
+		CC=0
+		SVT=5001 3002 2 
+		CC=1
+			C=17 1 2 19 0 1 0
+			CPC=0
+#NT=20064 0
+	PC=2
+	posx=1 v=2003 -1003.02
+	posy=1 v=2003 525.421
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 4900 1 
+		CC=1
+			C=18 0 1 19 1 2 0
+			CPC=0
+#NT=20016 0
+	PC=3
+	name=1 v=5000 worldNormal
+	posx=1 v=2003 -811.211
+	posy=1 v=2003 429.907
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 4900 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=19 0 3 20 1 2 0
+			CPC=0
+#NT=20015 0
+	PC=5
+	name=1 v=5000 worldNormal
+	posx=1 v=2003 -613.412
+	posy=1 v=2003 430.107
+	texcoordname=1 v=5000 worldNormal
+	tweaktexcoord=1 v=2001 1
+	group=-1
+	ISC=2
+		SVT=5001 5000 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=20 0 3 7 0 1 0
+			CPC=0
+#NT=20130 0
+	PC=3
+	posx=1 v=2003 -775.46
+	posy=1 v=2003 200.679
+	lightindex=2 e=0 v=2002 1
+	group=-1
+	ISC=1
+		SVT=2002 2002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=1
+			C=21 0 2 14 0 1 0
+			CPC=0
+#NT=20004 0
+	PC=2
+	posx=1 v=2003 757.315
+	posy=1 v=2003 -69.334
+	group=-1
+	ISC=3
+		SVT=5001 3003 1 0 0 
+		SVT=5001 1002 4 0 0 
+		SVT=5001 3003 2 0 0 
+	OSC=1
+		SVT=5001 5005 3 
+		CC=1
+			C=22 0 3 6 1 2 0
+			CPC=0
+#NT=20012 0
+	PC=2
+	posx=1 v=2003 522.365
+	posy=1 v=2003 -141.379
+	group=-1
+	ISC=0
+	OSC=2
+		SVT=5001 3003 1 
+		CC=1
+			C=23 0 1 22 0 1 0
+			CPC=0
+		SVT=5001 3002 2 
+		CC=0
+#NT=20012 0
+	PC=2
+	posx=1 v=2003 -481.354
+	posy=1 v=2003 -147.738
+	group=-1
+	ISC=0
+	OSC=2
+		SVT=5001 3003 1 
+		CC=1
+			C=24 0 1 26 0 1 0
+			CPC=0
+		SVT=5001 3002 2 
+		CC=1
+			C=24 1 2 29 1 2 0
+			CPC=0
+#NT=20081 0
+	PC=2
+	posx=1 v=2003 96.3958
+	posy=1 v=2003 13.5708
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 4900 1 
+		CC=1
+			C=25 0 1 26 1 2 0
+			CPC=0
+#NT=20016 0
+	PC=3
+	name=1 v=5000 position
+	posx=1 v=2003 308.173
+	posy=1 v=2003 -84.8668
+	group=-1
+	ISC=2
+		SVT=5001 3003 1 0 0 
+		SVT=5001 4900 2 0 0 
+	OSC=1
+		SVT=5001 3003 3 
+		CC=1
+			C=26 0 3 27 1 2 0
+			CPC=0
+#NT=20015 0
+	PC=7
+	name=1 v=5000 Position
+	posx=1 v=2003 509.002
+	posy=1 v=2003 -23.7301
+	texcoordname=1 v=5000 Position
+	semantic=1 v=5000 SV_Position
+	semantictype=1 v=5012 2
+	tweaktexcoord=1 v=2001 1
+	group=-1
+	ISC=2
+		SVT=5001 5000 1 0 0 
+		SVT=5001 3003 2 0 0 
+	OSC=1
+		SVT=5001 3003 3 
+		CC=1
+			C=27 0 3 22 2 2 0
+			CPC=0
+#NT=20061 0
+	PC=2
+	posx=1 v=2003 -643.45
+	posy=1 v=2003 -27.5667
+	group=-1
+	ISC=0
+	OSC=2
+		SVT=5001 4900 1 
+		CC=1
+			C=28 0 1 29 0 1 0
+			CPC=0
+		SVT=5001 4600 2 
+		CC=0
+#NT=20016 0
+	PC=3
+	name=1 v=5000 worldSpacePos
+	posx=1 v=2003 -476.215
+	posy=1 v=2003 -12.7978
+	group=-1
+	ISC=2
+		SVT=5001 4900 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=29 0 3 32 1 2 0
+			CPC=0
+#NT=20110 0
+	PC=3
+	posx=1 v=2003 -474.102
+	posy=1 v=2003 123.208
+	previewswatch=1 v=2002 1
+	group=-1
+	ISC=1
+		SVT=5001 4900 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=1
+			C=30 0 2 32 0 1 0
+			CPC=0
+#NT=20067 0
+	PC=2
+	posx=1 v=2003 -660.235
+	posy=1 v=2003 89.1949
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 4900 1 
+		CC=1
+			C=31 0 1 30 0 1 0
+			CPC=0
+#NT=20022 0
+	PC=3
+	name=1 v=5000 eyeVector
+	posx=1 v=2003 -287.614
+	posy=1 v=2003 126.344
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=32 0 3 33 1 2 0
+			CPC=0
+#NT=20015 0
+	PC=5
+	name=1 v=5000 eyeVector
+	posx=1 v=2003 -110.462
+	posy=1 v=2003 127.075
+	texcoordname=1 v=5000 eyeVector
+	tweaktexcoord=1 v=2001 1
+	group=-1
+	ISC=2
+		SVT=5001 5000 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=33 0 3 34 0 1 0
+			CPC=0
+#NT=20021 0
+	PC=3
+	name=1 v=5000 eyeVector
+	posx=1 v=2003 60.1676
+	posy=1 v=2003 159.394
+	group=-1
+	ISC=1
+		SVT=5001 3002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=2
+			C=34 0 2 35 0 1 0
+			CPC=0
+			C=34 0 2 43 0 1 0
+			CPC=0
+#NT=20018 0
+	PC=3
+	name=1 v=5000 fresnel
+	posx=1 v=2003 236.027
+	posy=1 v=2003 210.414
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=35 0 3 36 0 1 0
+			CPC=0
+#NT=20023 0
+	PC=3
+	name=1 v=5000 fresnel
+	posx=1 v=2003 411.914
+	posy=1 v=2003 237.74
+	group=-1
+	ISC=1
+		SVT=5001 2003 1 0 0 
+	OSC=1
+		SVT=5001 2003 2 
+		CC=1
+			C=36 0 2 37 1 2 0
+			CPC=0
+#NT=20022 0
+	PC=3
+	name=1 v=5000 fresnel
+	posx=1 v=2003 598.845
+	posy=1 v=2003 176.961
+	group=-1
+	ISC=2
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=37 0 3 39 0 1 0
+			CPC=0
+#NT=20017 0
+	PC=2
+	posx=1 v=2003 421.263
+	posy=1 v=2003 132.328
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 2003 1 
+		CC=1
+			C=38 0 1 37 0 1 0
+			CPC=0
+#NT=20055 0
+	PC=3
+	name=1 v=5000 fresnel
+	posx=1 v=2003 771.617
+	posy=1 v=2003 242.481
+	group=-1
+	ISC=2
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=39 0 3 42 0 1 0
+			CPC=0
+#NT=20017 0
+	PC=6
+	name=1 v=5000 fresnelPower
+	posx=1 v=2003 585.526
+	posy=1 v=2003 308.271
+	value=2 e=0 v=2003 3.0
+	defineinheader=2 e=0 v=2001 1
+	uistep=2 e=0 v=2003 1.0
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 2003 1 
+		CC=1
+			C=40 0 1 39 1 2 0
+			CPC=0
+#NT=20026 0
+	PC=4
+	name=1 v=5000 color
+	posx=1 v=2003 1056.21
+	posy=1 v=2003 467.476
+	supportmulticonnections=1 v=2001 1
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 2003 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=41 0 3 12 4 5 0
+			CPC=0
+#NT=20016 0
+	PC=3
+	name=1 v=5000 fresnel
+	posx=1 v=2003 939.834
+	posy=1 v=2003 284.232
+	group=-1
+	ISC=2
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=42 0 3 41 1 2 0
+			CPC=0
+#NT=20057 0
+	PC=3
+	name=1 v=5000 reflectionVector
+	posx=1 v=2003 283.092
+	posy=1 v=2003 783.443
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 3002 3 
+		CC=1
+			C=43 0 3 44 0 1 0
+			CPC=0
+#NT=20112 0
+	PC=3
+	name=1 v=5000 reflectionVector
+	posx=1 v=2003 470.724
+	posy=1 v=2003 794.035
+	group=-1
+	ISC=1
+		SVT=5001 3002 1 0 0 
+	OSC=1
+		SVT=5001 3002 2 
+		CC=1
+			C=44 0 2 45 0 1 0
+			CPC=0
+#NT=20018 0
+	PC=3
+	name=1 v=5000 specular
+	posx=1 v=2003 654.93
+	posy=1 v=2003 734.189
+	group=-1
+	ISC=2
+		SVT=5001 3002 1 0 0 
+		SVT=5001 3002 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=1
+			C=45 0 3 46 0 1 0
+			CPC=0
+#NT=20023 0
+	PC=3
+	name=1 v=5000 specular
+	posx=1 v=2003 832.478
+	posy=1 v=2003 758.553
+	group=-1
+	ISC=1
+		SVT=5001 2003 1 0 0 
+	OSC=1
+		SVT=5001 2003 2 
+		CC=1
+			C=46 0 2 47 0 1 0
+			CPC=0
+#NT=20055 0
+	PC=3
+	name=1 v=5000 specular
+	posx=1 v=2003 1001.09
+	posy=1 v=2003 795.223
+	group=-1
+	ISC=2
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+	OSC=1
+		SVT=5001 2003 3 
+		CC=4
+			C=47 0 3 48 0 1 0
+			CPC=0
+			C=47 0 3 48 1 2 0
+			CPC=0
+			C=47 0 3 48 3 4 0
+			CPC=0
+			C=47 0 3 41 1 2 1
+			CPC=0
+#NT=20020 0
+	PC=2
+	posx=1 v=2003 1256.43
+	posy=1 v=2003 756.099
+	group=-1
+	ISC=6
+		SVT=5001 2003 1 0 0 
+		SVT=5001 2003 2 0 0 
+		SVT=5001 3001 3 0 0 
+		SVT=5001 2003 4 0 0 
+		SVT=5001 3002 5 0 0 
+		SVT=5001 2003 6 0 0 
+	OSC=3
+		SVT=5001 3001 7 
+		CC=0
+		SVT=5001 3002 8 
+		CC=0
+		SVT=5001 3003 9 
+		CC=0
+#NT=20017 0
+	PC=5
+	name=1 v=5000 specularPower
+	posx=1 v=2003 754.535
+	posy=1 v=2003 892.275
+	value=2 e=0 v=2003 30.0
+	defineinheader=2 e=0 v=2001 1
+	group=-1
+	ISC=0
+	OSC=1
+		SVT=5001 2003 1 
+		CC=1
+			C=49 0 1 47 1 2 0
+			CPC=0
