@@ -1,6 +1,14 @@
+// ----------------------------------- Per Frame --------------------------------------
+cbuffer UpdatePerFrame : register(b0)
+{
+    float4x4 viewI : ViewInverse < string UIWidget = "None"; >;
+
+};
+
 // --------------------------------------- Per Object -----------------------------------------
 cbuffer UpdatePerObject : register(b1)
 {
+    float4x4 world : World < string UIWidget = "None"; >;
     float4x4 worldIT : WorldInverseTranspose < string UIWidget = "None"; >;
 
     float4x4 wvp : WorldViewProjection < string UIWidget = "None"; >;
@@ -21,6 +29,23 @@ cbuffer UpdateAttributes : register(b2)
         string UIName = "diffuseColor";
         string UIWidget = "ColorPicker";
     > = {1.0,1.0,1.0};
+    
+    float3 specularColor
+    <
+        string UIName = "specularColor";
+        string UIWidget = "ColorPicker";
+    > = {1.0,1.0,1.0};
+    
+    float specularPower
+    <
+        float UIMin = 0.0;
+        float UISoftMin = 0.0;
+        float UIMax = 99.0;
+        float UISoftMax = 99.0;
+        float UIStep = 0.01;
+        string UIName = "specularPower";
+        string UIWidget = "Slider";
+    > = 30.0;
 
 };
 
@@ -78,6 +103,7 @@ struct SHADERDATA
     float3 worldNormal : TEXCOORD1;
     float3 tangent : TEXCOORD2;
     float3 binormal : TEXCOORD3;
+    float3 eyeVector : TEXCOORD4;
     float4 position : SV_Position;
 };
 
@@ -90,6 +116,11 @@ SHADERDATA ShaderVertex(APPDATA IN)
     OUT.uv = IN.map1;
     OUT.tangent = IN.Tangent;
     OUT.binormal = IN.BiNormal;
+    
+    float3 CameraPosition = viewI[3].xyz;
+    float3 worldSpacePos = mul(world, IN.Position);
+    OUT.eyeVector = CameraPosition - worldSpacePos;
+    
     float4 position = mul(float4(IN.Position, 1), wvp);
     OUT.position = position;
 
@@ -106,12 +137,17 @@ PIXELDATA ShaderPixel(SHADERDATA IN)
 {
     PIXELDATA OUT;
 
-    float3 lightDir = normalize(-(Light1Dir));
+    float3 lightDir = normalize(-Light1Dir);
+    float3 eyeVector = normalize(IN.eyeVector);
     float3 worldNormal = normalTexture.Sample(textureSampler, float2(IN.uv.x, 1-IN.uv.y)).rgb * 2.0 - 1.0;
     worldNormal = ((worldNormal.x * IN.tangent) + (worldNormal.y * IN.binormal) + (worldNormal.z * IN.worldNormal));
+    
+    float3 reflectionVec = -reflect(eyeVector, worldNormal);
+    float3 specular = pow(saturate(dot(reflectionVec, lightDir)), specularPower) * specularColor;
+    
     float lambert = saturate(dot(lightDir, normalize(IN.worldNormal)));
     float4 diffuseMap = diffuseTexture.Sample(textureSampler, float2(IN.uv.x, 1-IN.uv.y));
-    float3 color = ((lambert + ambientColor.xyz) * (diffuseColor.xyz * diffuseMap.xyz));
+    float3 color = ((lambert + ambientColor.xyz) * (diffuseColor.xyz * diffuseMap.xyz)) + specular;
     OUT.Color = float4(color.x, color.y, color.z, 1.0);
     //OUT.Color = float4(worldNormal, 1.0);
 
