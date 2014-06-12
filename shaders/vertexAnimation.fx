@@ -34,6 +34,13 @@ float4x4 worldInverseTranspose : WorldInverseTranspose   < string UIWidget = "No
 // time from maya
 float time : Time < string UIWidget = "None"; >;
 
+// render state
+RasterizerState wireframeState
+{
+    CullMode = None;
+    FillMode = WIREFRAME;
+};
+
 // parameters section
 float3 diffuseColor : Diffuse
 <
@@ -102,7 +109,7 @@ SHADERDATA vShader(APPDATA IN)
 {
     SHADERDATA OUT;
     float r = length(IN.position.xz);
-    float y = Amplitude * sin(-PI * r * Frequency * time) / r;
+    float y = Amplitude * sin(PI * r * Frequency * time) / r;
     OUT.position = mul(float4(IN.position.x, y, IN.position.z, 1.), wvp);
     OUT.worldNormal = mul(IN.normal, worldInverseTranspose);
     
@@ -137,5 +144,6 @@ technique11 Simple
         SetDomainShader(NULL);
         SetGeometryShader(NULL);
         SetPixelShader(CompileShader(ps_5_0, pShader()));
+        SetRasterizerState(wireframeState);
     }
 }
