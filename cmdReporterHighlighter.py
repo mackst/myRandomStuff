@@ -32,18 +32,25 @@ import os
 import re
 import keyword
 
-from PySide import QtGui, QtCore
 from maya import cmds
+from maya import OpenMayaUI as omui
+
+from PySide import QtGui, QtCore
 
 
 def getMayaWindowWidget():
     '''get maya window widget for Qt'''
     mwin = None
-    mapp = QtGui.QApplication.instance()
-    for widget in mapp.topLevelWidgets():
-        if widget.objectName() == 'MayaWindow':
-            mwin = widget
-            break
+    try:
+        from shiboken import wrapInstance
+        mwinPtr = omui.MQtUtil.mainWindow()
+        mwin = wrapInstance(long(mwinPtr), QtGui.QMainWindow)
+    except:
+        mapp = QtGui.QApplication.instance()
+        for widget in mapp.topLevelWidgets():
+            if widget.objectName() == 'MayaWindow':
+                mwin = widget
+                break
     return mwin
 
 def highlightCmdReporter():
@@ -67,51 +74,50 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         self._keywordColor = QtGui.QColor(0, 128, 255)
 
         self._keywordFormat()
-        # too slow need disable it
-        # self._cmdsFunctionFormat()
+        self._cmdsFunctionFormat()
 
         # maya api format
         mapiFormat = QtGui.QTextCharFormat()
         mapiFormat.setForeground(self._keywordColor)
-        self.__rules.append(('\\bM\\w+\\b', mapiFormat))
+        self.__rules.append((re.compile('\\bM\\w+\\b'), mapiFormat))
         # Qt
-        self.__rules.append(('\\bQ\\w+\\b', mapiFormat))
+        self.__rules.append((re.compile('\\bQ\\w+\\b'), mapiFormat))
 
         # quotation
         self._quotationFormat = QtGui.QTextCharFormat()
         self._quotationFormat.setForeground(QtCore.Qt.green)
         # quote: ""
-        self.__rules.append(('".*"', self._quotationFormat))
+        self.__rules.append((re.compile('".*"'), self._quotationFormat))
         # single quotes for python: ''
-        self.__rules.append(("'.*'", self._quotationFormat))
+        self.__rules.append((re.compile("'.*'"), self._quotationFormat))
 
         # sing line comment
         self._commentFormat = QtGui.QTextCharFormat()
         # orange red
         self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
         # // mel comment
-        self.__rules.append(('//[^\n]*', self._commentFormat))
+        self.__rules.append((re.compile('//[^\n]*'), self._commentFormat))
         # # python comment
-        self.__rules.append(('#[^\n]*', self._commentFormat))
+        self.__rules.append((re.compile('#[^\n]*'), self._commentFormat))
 
         # function and class format
         funcFormat = QtGui.QTextCharFormat()
         funcFormat.setFontWeight(QtGui.QFont.Bold)
-        self.__rules.append(('\\b(\\w+)\(.*\):', funcFormat))
+        self.__rules.append((re.compile('\\b(\\w+)\(.*\):'), funcFormat))
 
         # mel warning
         warningFormat = QtGui.QTextCharFormat()
         warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
         warningFormat.setBackground(QtCore.Qt.yellow)
         warningFormat.setFontWeight(QtGui.QFont.Bold)
-        self.__rules.append(('// Warning:[^\n]*//', warningFormat))
+        self.__rules.append((re.compile('// Warning:[^\n]*//'), warningFormat))
 
         # mel error
         errorFormat = QtGui.QTextCharFormat()
         errorFormat.setForeground(QtGui.QColor('#FF9ACD32'))
         errorFormat.setBackground(QtCore.Qt.red)
         errorFormat.setFontWeight(QtGui.QFont.Bold)
-        self.__rules.append(('// Error:[^\n]*//', errorFormat))
+        self.__rules.append((re.compile('// Error:[^\n]*//'), errorFormat))
 
         # blocks: start : end
         self._blockRegexp = {
@@ -128,9 +134,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         '''set up keyword format'''
         # mel keyword
         melKeywords = ['false', 'float', 'int', 'matrix', 'off', 'on', 'string',
-                    'true', 'vector', 'yes', 'alias', 'case', 'catch', 'break',
-                    'case', 'continue', 'default', 'do', 'else', 'for', 'if', 'in',
-                    'while', 'alias', 'case', 'catch', 'global', 'proc', 'return', 'source', 'switch']
+                       'true', 'vector', 'yes', 'alias', 'case', 'catch', 'break',
+                       'case', 'continue', 'default', 'do', 'else', 'for', 'if', 'in',
+                       'while', 'alias', 'case', 'catch', 'global', 'proc', 'return', 'source', 'switch']
         # python keyword
         pyKeywords = keyword.kwlist + ['False', 'True', 'None']
 
@@ -140,19 +146,33 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         keywordFormat = QtGui.QTextCharFormat()
         keywordFormat.setForeground(self._keywordColor)
         keywordFormat.setFontWeight(QtGui.QFont.Bold)
-        self.__rules += [('\\b%s\\b' % word, keywordFormat) for
-                        word in keywords]
+        kwtext = '\\b('
+        for kw in keywords:
+            kwtext += kw + "|"
+        kwtext = kwtext[:-1] + ')\\b'
+        self.__rules.append((re.compile(kwtext), keywordFormat))
 
     def _cmdsFunctionFormat(self):
         '''set up maya.cmds functions'''
         mayaBinDir = os.path.dirname(sys.executable)
         cmdsList = os.path.join(mayaBinDir, 'commandList')
-        functions = []
+        functions = '\\b('
         with open(cmdsList) as phile:
-            [functions.append(line.split(' ')[0]) for line in phile]
+            for line in phile:
+                functions += line.split(' ')[0] + '|'
 
         # global MEL procedures
-        functions += cmds.melInfo()
+        melProcedures = cmds.melInfo()
+#        melProcedures_00 = '\\b('
+        melProc = []
+        melProc.append('\\b(' + '|'.join(melProcedures[:1400]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[1400:2800]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[2800:4200]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[4200:5400]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[5400:6600]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[6600:7800]) + ')\\b')
+        #melProc.append('\\b(' + '|'.join(melProcedures[7800:8000]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[7800:]) + ')\\b')
 
         # TODO: should update it when a plug-in was load.
         # function from plug-ins
@@ -160,13 +180,15 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         for plugin in plugins:
             funcFromPlugin = cmds.pluginInfo(plugin, q=1, command=1)
             if funcFromPlugin:
-                functions.extend(funcFromPlugin)
+                functions += '|'.join(funcFromPlugin)
+        functions = functions[:-1] + ')\\b'
 
         # function format
         funcFormat = QtGui.QTextCharFormat()
         funcFormat.setForeground(self._keywordColor)
-        self.__rules += [('\\b%s\\b' % func, funcFormat) for
-                        func in functions]
+        self.__rules.append((re.compile(functions), funcFormat))
+        for mp in melProc:
+            self.__rules.append((re.compile(mp), funcFormat))
 
     def _melMLCommentFormat(self, text):
         '''set up mel multi-line comment: /*  */'''
@@ -195,13 +217,13 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
     def highlightBlock(self, text):
         '''highlight text'''
-        for pattern, tformat in self.__rules:
-            regExp = QtCore.QRegExp(pattern)
-            index = regExp.indexIn(text)
-            while index >= 0:
-                length = regExp.matchedLength()
-                self.setFormat(index, length, tformat)
-                index = regExp.indexIn(text, index + length)
+        for regExp, tformat in self.__rules:
+            match = regExp.search(text)
+            if match:
+                self.setFormat(match.start(), match.end() - match.start(), tformat)
+#             while match != None:
+#                 self.setFormat(match.start(), match.end() - match.start(), tformat)
+#                 match = regExp.search(text, match.start())
 
         # blocks
         self._melMLCommentFormat(text)
