@@ -143,10 +143,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         keywordFormat = QtGui.QTextCharFormat()
         keywordFormat.setForeground(self._keywordColor)
         keywordFormat.setFontWeight(QtGui.QFont.Bold)
-        kwtext = '\\b('
-        for kw in keywords:
-            kwtext += kw + "|"
-        kwtext = kwtext[:-1] + ')\\b'
+        kwtext = '\\b(' + "|".join(keywords) + ')\\b'
         self.__rules.append((re.compile(kwtext), keywordFormat))
 
     def _cmdsFunctionFormat(self):
