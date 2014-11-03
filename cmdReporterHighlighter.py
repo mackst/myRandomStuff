@@ -69,10 +69,15 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         super(Highlighter, self).__init__(parent)
 
         self.__rules = []
+        
+        # numeric color
+        self._numericFormat = QtGui.QTextCharFormat()
+        self._numericFormat.setForeground(QtGui.QColor('#9ACD32'))
 
         # keywords color
         self._keywordColor = QtGui.QColor(0, 128, 255)
 
+        self._numeric()
         self._keywordFormat()
         self._cmdsFunctionFormat()
 
@@ -126,6 +131,15 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         # mel multi-line comment: /*  */
         self._melMLComStart = re.compile('/\\*')
         self._melMLComEnd = re.compile('\\*/')
+        
+    def _numeric(self):
+        '''set up numeric format'''
+        num_01 = re.compile('\\b[+-]?[0-9]+[lL]?\\b')
+        num_02 = re.compile('\\b[+-]?0[xX][0-9A-Fa-f]+[lL]?\\b')
+        num_03 = re.compile('\\b[+-]?[0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?\\b')
+        num_regs = (num_01, num_02, num_03)
+        for nr in num_regs:
+            self.__rules.append((nr, self._numericFormat))
 
     def _keywordFormat(self):
         '''set up keyword format'''
