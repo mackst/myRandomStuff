@@ -119,12 +119,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         errorFormat.setFontWeight(QtGui.QFont.Bold)
         self.__rules.append((re.compile('// Error:[^\n]*//'), errorFormat))
 
-        # blocks: start : end
-        self._blockRegexp = {
-                            '"""\\*' : ('\\*"""', self._quotationFormat),
-                            # python  multi-line string: '''   '''
-                            "'''\\*" : ("\\*'''", self._quotationFormat),
-                            }
+        # Quotes
+        self._singleQuotes = QtCore.QRegExp("'''")
+        self._doubleQuotes = QtCore.QRegExp('"""')
 
         # mel multi-line comment: /*  */
         self._melMLComStart = re.compile('/\\*')
@@ -214,34 +211,42 @@ class Highlighter(QtGui.QSyntaxHighlighter):
                 commentLen = len(text)
         if commentLen > 0:
             self.setFormat(startIndex, commentLen, self._commentFormat)
+            
+    def quotesFormat(self, text, regExp, state):
+        '''set up single or double quotes strings format'''
+        if self.previousBlockState() == state:
+            startIndex = 0
+            add = 0
+        else:
+            startIndex = regExp.indexIn(text)
+            add = regExp.matchedLength()
+            
+        while startIndex >= 0:
+            end = regExp.indexIn(text, startIndex + add)
+            if end >= add:
+                quotesLen = end - startIndex + regExp.matchedLength()
+                self.setCurrentBlockState(0)
+            else:
+                self.setCurrentBlockState(state)
+                quotesLen = len(text) - startIndex + add
+            self.setFormat(startIndex, quotesLen, self._quotationFormat)
+            startIndex = regExp.indexIn(text, startIndex + quotesLen)
+            
+        if self.currentBlockState() == state:
+            return True
+        else:
+            return False
 
     def highlightBlock(self, text):
         '''highlight text'''
         for regExp, tformat in self.__rules:
             match = regExp.search(text)
-            if match:
+            while match:
                 self.setFormat(match.start(), match.end() - match.start(), tformat)
-#             while match != None:
-#                 self.setFormat(match.start(), match.end() - match.start(), tformat)
-#                 match = regExp.search(text, match.start())
+                match = regExp.search(text, match.end())
 
         # blocks
         self._melMLCommentFormat(text)
-        textLength = len(text)
-        for startBlock in self._blockRegexp:
-            startIndex = 0
-            startRegExp = QtCore.QRegExp(startBlock)
-            endRegExp = QtCore.QRegExp(self._blockRegexp[startBlock][0])
-            if self.previousBlockState() != 1:
-                startIndex = startRegExp.indexIn(text)
-
-            while startIndex >= 0:
-                endIndex = endRegExp.indexIn(text, startIndex)
-                if endIndex == -1:
-                    self.setCurrentBlockState(1)
-                    blockLength = textLength - startIndex
-                else:
-                    blockLength = endIndex - startIndex + endRegExp.matchedLength()
-
-                self.setFormat(startIndex, blockLength, self._blockRegexp[startBlock][1])
-                startIndex = startRegExp.indexIn(text, startIndex + blockLength)
+        quotesState = self.quotesFormat(text, self._singleQuotes, 2)
+        if not quotesState:
+            self.quotesFormat(text, self._doubleQuotes, 3)
