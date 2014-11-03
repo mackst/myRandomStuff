@@ -160,16 +160,15 @@ class Highlighter(QtGui.QSyntaxHighlighter):
 
         # global MEL procedures
         melProcedures = cmds.melInfo()
-#        melProcedures_00 = '\\b('
+        maxlen = 1400
+        stop = len(melProcedures) / maxlen
         melProc = []
-        melProc.append('\\b(' + '|'.join(melProcedures[:1400]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[1400:2800]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[2800:4200]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[4200:5400]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[5400:6600]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[6600:7800]) + ')\\b')
-        #melProc.append('\\b(' + '|'.join(melProcedures[7800:8000]) + ')\\b')
-        melProc.append('\\b(' + '|'.join(melProcedures[7800:]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[:maxlen]) + ')\\b')
+        for i in range(1, stop - 1):
+            start = maxlen * i
+            end = maxlen * (i + 1)
+            melProc.append('\\b(' + '|'.join(melProcedures[start:end]) + ')\\b')
+        melProc.append('\\b(' + '|'.join(melProcedures[maxlen*stop:]) + ')\\b')
 
         # TODO: should update it when a plug-in was load.
         # function from plug-ins
