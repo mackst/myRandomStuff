@@ -73,6 +73,11 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         # numeric color
         self._numericFormat = QtGui.QTextCharFormat()
         self._numericFormat.setForeground(QtGui.QColor('#9ACD32'))
+        
+        # mel command options started with -
+        melOpsFormat = QtGui.QTextCharFormat()
+        melOpsFormat.setForeground(QtGui.QColor('#B8860B'))
+        self.__rules.append((re.compile('-[a-zA-Z]+\\b'), melOpsFormat))
 
         # keywords color
         self._keywordColor = QtGui.QColor(0, 128, 255)
