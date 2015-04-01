@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Mack Stone
+# Copyright (c) 2014-2015 Mack Stone
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -26,17 +26,42 @@
 #
 # import cmdReporterHighlighter as crHighlighter
 # crHighlighter.highlightCmdReporter()
+#
+# using userSetup.py
+# added follow line to your userSetup.py
+#
+# from maya import utils
+# import cmdReporterHighlighter as crHighlighter
+# utils.executeDeferred(crHighlighter.launchFromCmdWndIcon)
 
 import sys
 import os
 import re
 import keyword
 
-from maya import cmds
+from maya import (cmds, mel)
 from maya import OpenMayaUI as omui
 
 from PySide import QtGui, QtCore
 
+def launchFromCmdWndIcon():
+    '''launch from maya command line script editor icon.'''
+    def cmdWnd(arg=None):
+        cmds.ScriptEditor()
+        highlightCmdReporter()
+
+    # get command line formLayout
+    gCommandLineForm = mel.eval('$tempVar = $gCommandLineForm')
+    commandLineForm = cmds.formLayout(gCommandLineForm, q=1, ca=1)[0]
+    # get cmdWndIcon button
+    cmdWndIcon = cmds.formLayout(commandLineForm, q=1, ca=1)[-1]
+    # change the command of the button
+    cmds.symbolButton(cmdWndIcon, e=1, c=cmdWnd)
+
+    # change the main manu item command
+    #menuName = 'wmScriptEditor'
+    #if cmds.menuItem(menuName, q=1, ex=1):
+        #cmds.menuItem(menuName, e=1, c=cmdWnd)
 
 def getMayaWindowWidget():
     '''get maya window widget for Qt'''
