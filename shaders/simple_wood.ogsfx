@@ -1,0 +1,80 @@
+#version 410
+
+// from shadertoy
+// https://www.shadertoy.com/view/lss3WN
+
+// transform object vertices to world-space:
+uniform mat4 wvp : WorldViewProjection  < string UIWidget="None"; >;
+
+uniform float destiny  = 40.0;
+
+uniform float trunk_x  = 10.0;
+
+uniform float trunk_y  = 10.0;
+
+uniform vec3 color_1 : Diffuse
+<
+    string UIWidget = "Color";
+> = {0.88, 0.72, 0.5};
+
+uniform vec3 color_2 : ambient = {0.76, 0.54, 0.26};
+
+// data from maya
+attribute appIn
+{
+    vec3 inPos : POSITION;
+    vec2 inUV  : TEXCOORD0;
+}
+
+// output from vertex shader
+// input to fragment shader
+attribute vsOut
+{
+    vec2 uv : TEXCOORD0;
+}
+
+// output from fragment shader
+attribute pixelOut
+{
+    vec4 outColor : COLOR0;
+}
+
+
+GLSLShader VS
+{
+    void main()
+    {
+        uv = inUV;
+        gl_Position = wvp * vec4(inPos, 1.0);
+    }
+}
+
+
+GLSLShader FS
+{
+    void main()
+    {
+        // destiny
+        vec2 pos = uv.xy * destiny;
+        
+        // Center of trunk
+        pos += vec2(trunk_x, trunk_y);
+        
+        float x = sqrt(pos.x * pos.x + pos.y * pos.y);
+        x = fract(x);
+        
+        vec3 cl = mix(color_1, color_2, x);
+        outColor = vec4(cl, 1.0);
+    }
+}
+
+
+// Techniques.
+technique Main
+{
+    pass p0
+    {
+        VertexShader (in appIn, out vsOut) = VS;
+        PixelShader (in vsOut, out pixelOut) = FS;
+    }
+}
