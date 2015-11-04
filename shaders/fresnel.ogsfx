@@ -1,0 +1,128 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2015 Mack Stone
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
+uniform mat4 wvp   : WorldViewProjection     < string UIWidget="None"; >;
+uniform mat4 wit   : WorldInverseTranspose   < string UIWidget="None"; >;
+uniform mat4 world : World                   < string UIWidget="None"; >;
+
+uniform mat4 viewI : ViewInverse             < string UIWidget="None"; >;
+
+
+// parameters section
+uniform vec3 ambientColor : Diffuse
+<
+    string UIName = "Ambient Color";
+> = {0.5, 0.5, 0.5};
+
+uniform vec3 diffuseColor : Diffuse
+<
+    string UIName = "Diffuse Color";
+> = {1.0, 1.0, 1.0};
+
+uniform float fresnelPower
+<
+    float UIMin = 0.0;
+    float UIMax= 99.0;
+    float UIStep = 1.0;
+    string UIName = "Fresnel Power";
+> = 3.0;
+
+// light direction
+uniform vec3 Light0Dir : DIRECTION
+<
+    string UIName = "Light 0 Direction";
+    string Space = "World";
+    string Object = "Light 0";
+> = {0.0, -1.0, 0.0};
+
+
+//------------------------------------
+// Attributes
+//------------------------------------
+// input from application
+attribute appIn
+{
+    vec3 inPosition  :  POSITION;
+    vec3 inNormal    :  NORMAL;
+}
+
+// ouput from vertex shader
+// input to pixel shader
+attribute vsOut
+{
+    vec3 worldNormal   :  NORMAL;
+    vec3 eyeVector     :  TEXCOORD1;
+}
+
+// output to pixel shader
+attribute pixelOut
+{
+    vec4 outColor   :  COLOR0;
+}
+
+//------------------------------------
+// vertex shader
+//------------------------------------
+GLSLShader VS
+{
+    void main()
+    {
+        vec3 cameraPos = viewI[3].xyz;
+        vec4 worldSpacePos = world * vec4(inPosition, 1.0);
+        eyeVector = cameraPos - worldSpacePos.xyz;
+
+        worldNormal = mat3(wit) * inNormal;
+        gl_Position = wvp * vec4(inPosition, 1.0);
+    }
+}
+
+
+//------------------------------------
+// pixel shader
+//------------------------------------
+GLSLShader FS
+{
+    void main()
+    {
+        vec3 wNormal = normalize(worldNormal);
+        vec3 lightDir = normalize(-Light0Dir);
+
+        float lambert = clamp(dot(lightDir, wNormal), 0.0, 1.0);
+
+        vec3 color = diffuseColor * (ambientColor + lambert);
+        float fresnel = pow(1.0 - clamp(dot(normalize(eyeVector), wNormal), 0.0, 1.0), fresnelPower);
+        vec3 finalColor = color + (fresnel * lambert);
+        outColor = vec4(finalColor, 1.0);
+        // outColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+}
+
+technique Simple
+{
+    pass p0
+    {
+        VertexShader (in appIn, out vsOut) = VS;
+        PixelShader (in vsOut, out pixelOut) = FS;
+    }
+}
