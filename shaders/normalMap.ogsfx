@@ -36,25 +36,6 @@ uniform mat4 wit        : WorldInverseTranspose   < string UIWidget="None"; >;
 uniform mat4 viewI : ViewInverse             < string UIWidget="None"; >;
 
 
-// parameters section
-uniform vec3 ambientColor : Diffuse
-<
-    string UIName = "Ambient Color";
-> = {0.5, 0.5, 0.5};
-
-uniform vec3 diffuseColor : Diffuse
-<
-    string UIName = "Diffuse Color";
-> = {1.0, 1.0, 1.0};
-
-uniform float fresnelPower
-<
-    float UIMin = 0.0;
-    float UIMax= 99.0;
-    float UIStep = 1.0;
-    string UIName = "Fresnel Power";
-> = 3.0;
-
 // light
 uniform vec3 Light0Pos : POSITION
 <
