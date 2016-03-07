@@ -1,0 +1,271 @@
+/*
+The MIT License (MIT)
+
+Copyright (c) 2016 Mack Stone
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/*
+A parallax map shader from
+https://github.com/SaschaWillems/Vulkan/tree/master/data/shaders/parallax
+*/
+
+
+// uniform mat4 wvp   : WorldViewProjection     < string UIWidget="None"; >;
+uniform mat4 world      : World                   < string UIWidget="None"; >;
+uniform mat4 view       : View                    < string UIWidget="None"; >;
+uniform mat4 projection : Projection              < string UIWidget="None"; >;
+
+uniform mat4 wit        : WorldInverseTranspose   < string UIWidget="None"; >;
+uniform mat4 viewI      : ViewInverse             < string UIWidget="None"; >;
+
+
+// parameters section
+uniform bool Parallax = true;
+
+uniform float scale
+<
+    float UIMin = 0.0;
+    float UIMax= 0.1;
+    float UIStep = 0.01;
+    string UIName = "Scale";
+> = 0.06;
+
+uniform float bias
+<
+    float UIMin = -10.0;
+    float UIMax= 10.0;
+    float UIStep = 0.01;
+    string UIName = "Bias";
+> = -0.04;
+
+uniform float lightRadius
+<
+    float UIMin = 0.0;
+    float UIMax= 99.0;
+    float UIStep = 1.0;
+    string UIName = "Light Radius";
+> = 20.0;
+
+uniform int usePom
+<
+    int UIMin = 0;
+    int UIMax= 1;
+    int UIStep = 1;
+    string UIName = "Disable/Enable Parallax";
+> = 1;
+
+// light
+uniform vec3 Light0Pos : POSITION
+<
+	string UIName = "Light 0 Position";
+	string Space = "World";
+	string Object = "Light 0";
+> = {1.0, 1.0, 1.0};
+
+uniform vec3 Light0Dir : DIRECTION
+<
+    string UIName = "Light 0 Direction";
+    string Space = "World";
+    string Object = "Light 0";
+> = {0.0, -1.0, 0.0};
+
+
+// textures
+uniform texture2D diffuseMap
+<
+    //Specify the texture file to be loaded by default
+    string ResourceName = "";
+
+    //Specify the type of texture
+    string ResourceType = "2D";
+
+    string UIName = "Diffuse Map";
+>;
+
+uniform texture2D normalHeightMap
+<
+    //Specify the texture file to be loaded by default
+    string ResourceName = "";
+
+    //Specify the type of texture
+    string ResourceType = "2D";
+
+    string UIName = "Normal Height Map";
+>;
+
+uniform sampler2D diffuseMapSampler = sampler_state
+{
+    Texture = <diffuseMap>;
+    TEXTURE_MIN_FILTER = LINEAR;
+    TEXTURE_MAG_FILTER = LINEAR;
+    TEXTURE_WRAP_S = REPEAT;
+    TEXTURE_WRAP_T = REPEAT;
+    TEXTURE_WRAP_R = REPEAT;
+};
+
+uniform sampler2D normalHeightMapSampler = sampler_state
+{
+    Texture = <normalHeightMap>;
+    TEXTURE_MIN_FILTER = LINEAR;
+    TEXTURE_MAG_FILTER = LINEAR;
+    TEXTURE_WRAP_S = REPEAT;
+    TEXTURE_WRAP_T = REPEAT;
+    TEXTURE_WRAP_R = REPEAT;
+};
+
+
+//------------------------------------
+// Attributes
+//------------------------------------
+// input from application
+attribute appIn
+{
+    vec3 inPosition   :  POSITION;
+    vec2 inUV         :  TEXCOORD0;
+    vec3 inNormal     :  NORMAL;
+    vec3 inTangent    :  TANGENT;
+    vec3 inBiTangent  :  BITANGENT;
+}
+
+// ouput from vertex shader
+// input to pixel shader
+attribute vsOut
+{
+    vec2 outUV           :  TEXCOORD0;
+    vec3 outLightVec     :  TEXCOORD1;
+    vec3 outLightVecB    :  TEXCOORD2;
+    vec3 outSpecular     :  TEXCOORD3;
+    vec3 outEyeVec       :  TEXCOORD4;
+    vec3 outLightDir     :  TEXCOORD5;
+    vec3 outViewVec      :  TEXCOORD6;
+}
+
+// output to pixel shader
+attribute pixelOut
+{
+    vec4 outColor   :  COLOR0;
+}
+
+//------------------------------------
+// vertex shader
+//------------------------------------
+GLSLShader VS
+{
+    void main()
+    {
+        vec3 vertexPosition = vec3(view * world * vec4(inPosition, 1.0));
+        outLightDir = normalize(Light0Pos - vertexPosition);
+        
+        // Setup (t)angent-(b)inormal-(n)ormal matrix for converting
+        // object coordinates into tangent space
+        mat3 normalMatrix = mat3(wit);
+        mat3 tbnMatrix;
+        tbnMatrix[0] = normalMatrix * inTangent;
+        tbnMatrix[1] = normalMatrix * inBiTangent;
+        tbnMatrix[2] = normalMatrix * inNormal;
+        
+        outEyeVec = vec3(-vertexPosition) * tbnMatrix;
+        
+        outLightVec.xyz = vec3(Light0Pos - vertexPosition) * tbnMatrix;
+        
+        vec3 lightDist = Light0Pos - inPosition;
+        outLightVecB.x = dot(inTangent, lightDist);
+        outLightVecB.y = dot(inBiTangent, lightDist);
+        outLightVecB.z = dot(inNormal, lightDist);
+        
+        vec3 cameraPos = viewI[3].xyz;
+        //vec3 camPos = vec3(normalMatrix * cameraPos);
+        vec3 camPos = normalMatrix * cameraPos.xyz;
+        
+        vec3 camVec = camPos - inPosition;
+        outViewVec.x = dot(inTangent, camVec);
+        outViewVec.y = dot(inBiTangent, camVec);
+        outViewVec.z = dot(inNormal, camVec);
+        
+        vec3 reflectVec = reflect(-camVec, inNormal);
+        vec3 outViewVec = outLightDir;
+        float specIntensity = pow(max(dot(reflectVec, outViewVec), 0.0), 8.0);
+        outSpecular = vec3(specIntensity * 3.0);
+        
+        
+        outUV = inUV;
+        
+        gl_Position = projection * view * world * vec4(inPosition, 1.0);
+    }
+}
+
+
+//------------------------------------
+// pixel shader
+//------------------------------------
+GLSLShader FS
+{
+    void main()
+    {
+        
+        vec3 specularColor = vec3(0.0, 0.0, 0.0);
+        float invRadius = 1.0 / lightRadius;
+        float ambient = 0.5;
+        
+        vec3 rgb, normal, eyeVecTs;
+        vec2 inUV = vec2(outUV.x, 1 - outUV.y);
+        vec2 UV = inUV;
+        
+        // Get new scaled and biased texture coordinates
+        // Height info is stored in alpha channel of normal map
+        vec2 height_bump = vec2(texture(normalHeightMapSampler, inUV).a * scale + bias, 0.0);
+        
+        // if parallax mapping is enabled, offset texture coordinates
+        if (usePom == 1)
+        {
+            UV = inUV + (height_bump.x * normalize(outEyeVec).xy);
+        }
+        
+        rgb = texture(diffuseMapSampler, UV).rgb;
+        
+        normal = normalize(outLightVec).xyz;
+        
+        eyeVecTs = normalize(outLightVec).xyz;
+        height_bump.y = min(dot(normal, eyeVecTs), 1.0);
+        height_bump.y = pow(height_bump.y, 8.0);
+        
+        float distSqr = dot(outLightVecB, outLightVecB);
+        vec3 lVec = outLightVecB * inversesqrt(distSqr);
+        
+        vec3 nvViewVec = normalize(outViewVec);
+        float specular = pow(clamp(dot(reflect(-nvViewVec, normal), lVec), 0.0, 1.0), 4.0);
+        
+        float atten = clamp(1.0 - invRadius * sqrt(distSqr), 0.0, 1.0);
+        float diffuse = clamp(dot(lVec, normal), 0.0, 1.0);
+        
+        outColor = vec4((rgb * ambient + (diffuse * rgb + 0.5 * specular * specularColor)) * atten, 1.0);
+        
+        //outColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+}
+
+technique Simple
+{
+    pass p0
+    {
+        VertexShader (in appIn, out vsOut) = VS;
+        PixelShader (in vsOut, out pixelOut) = FS;
+    }
+}
