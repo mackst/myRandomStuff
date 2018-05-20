@@ -1,0 +1,32 @@
+#version 450
+#extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shading_language_420pack : enable
+
+
+layout(local_size_x = 256) in;
+layout(binding = 0) buffer InputBuffer{ vec4 inPos[]; };
+layout(binding = 1) buffer OutputBuffer{ vec4 outPos[]; };
+layout(binding = 2) uniform UBO{
+float numVert;
+float angle;
+float envelope;
+} ubo;
+
+
+void main()
+{
+    uint index = gl_GlobalInvocationID.x;
+    if (index >= uint(ubo.numVert))
+        return;
+    vec4 pos = inPos[index];
+    vec4 oPos = pos;
+    float ff = ubo.angle * pos.y * ubo.envelope;
+    if (ff != 0.0f)
+    {
+        float cct = cos(ff);
+        float cst = sin(ff);
+        oPos.x = pos.x * cct - pos.z * cst;
+        oPos.z = pos.x * cst + pos.z * cct;
+    }
+    outPos[index] = oPos;
+}
