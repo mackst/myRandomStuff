@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014-2015 Mack Stone
+# Copyright (c) 2014-2018 Mack Stone
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -42,7 +42,17 @@ import keyword
 from maya import (cmds, mel)
 from maya import OpenMayaUI as omui
 
-from PySide import QtGui, QtCore
+try:
+  from PySide2.QtCore import * 
+  from PySide2.QtGui import * 
+  from PySide2.QtWidgets import *
+  from PySide2 import __version__
+  from shiboken2 import wrapInstance 
+except ImportError:
+  from PySide.QtCore import * 
+  from PySide.QtGui import * 
+  from PySide import __version__
+  from shiboken import wrapInstance 
 
 def launchFromCmdWndIcon():
     '''launch from maya command line script editor icon.'''
@@ -69,9 +79,9 @@ def getMayaWindowWidget():
     try:
         from shiboken import wrapInstance
         mwinPtr = omui.MQtUtil.mainWindow()
-        mwin = wrapInstance(long(mwinPtr), QtGui.QMainWindow)
+        mwin = wrapInstance(long(mwinPtr), QMainWindow)
     except:
-        mapp = QtGui.QApplication.instance()
+        mapp = QApplication.instance()
         for widget in mapp.topLevelWidgets():
             if widget.objectName() == 'MayaWindow':
                 mwin = widget
@@ -84,11 +94,11 @@ def highlightCmdReporter():
     cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
     if not cmdReporters: return
     # only setup for the first one
-    cmdReporter = mwin.findChild(QtGui.QTextEdit, cmdReporters[0])
+    cmdReporter = mwin.findChild(QTextEdit, cmdReporters[0])
     highlighter = Highlighter(parent=mwin)
     highlighter.setDocument(cmdReporter.document())
 
-class Highlighter(QtGui.QSyntaxHighlighter):
+class Highlighter(QSyntaxHighlighter):
     """syntax highlighter"""
     def __init__(self, parent=None):
         super(Highlighter, self).__init__(parent)
@@ -96,67 +106,67 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         self.__rules = []
         
         # numeric color
-        self._numericFormat = QtGui.QTextCharFormat()
-        self._numericFormat.setForeground(QtGui.QColor('#9ACD32'))
+        self._numericFormat = QTextCharFormat()
+        self._numericFormat.setForeground(QColor('#9ACD32'))
         
         # mel command options started with -
-        melOpsFormat = QtGui.QTextCharFormat()
-        melOpsFormat.setForeground(QtGui.QColor('#B8860B'))
+        melOpsFormat = QTextCharFormat()
+        melOpsFormat.setForeground(QColor('#B8860B'))
         self.__rules.append((re.compile('-[a-zA-Z]+\\b'), melOpsFormat))
 
         # keywords color
-        self._keywordColor = QtGui.QColor(0, 128, 255)
+        self._keywordColor = QColor(0, 128, 255)
 
         self._numeric()
         self._keywordFormat()
         self._cmdsFunctionFormat()
 
         # maya api format
-        mapiFormat = QtGui.QTextCharFormat()
+        mapiFormat = QTextCharFormat()
         mapiFormat.setForeground(self._keywordColor)
         self.__rules.append((re.compile('\\bM\\w+\\b'), mapiFormat))
         # Qt
         self.__rules.append((re.compile('\\bQ\\w+\\b'), mapiFormat))
 
         # quotation
-        self._quotationFormat = QtGui.QTextCharFormat()
-        self._quotationFormat.setForeground(QtCore.Qt.green)
+        self._quotationFormat = QTextCharFormat()
+        self._quotationFormat.setForeground(Qt.green)
         # quote: ""
         self.__rules.append((re.compile('".*"'), self._quotationFormat))
         # single quotes for python: ''
         self.__rules.append((re.compile("'.*'"), self._quotationFormat))
 
         # sing line comment
-        self._commentFormat = QtGui.QTextCharFormat()
+        self._commentFormat = QTextCharFormat()
         # orange red
-        self._commentFormat.setForeground(QtGui.QColor(255, 128, 64))
+        self._commentFormat.setForeground(QColor(255, 128, 64))
         # // mel comment
         self.__rules.append((re.compile('//[^\n]*'), self._commentFormat))
         # # python comment
         self.__rules.append((re.compile('#[^\n]*'), self._commentFormat))
 
         # function and class format
-        funcFormat = QtGui.QTextCharFormat()
-        funcFormat.setFontWeight(QtGui.QFont.Bold)
+        funcFormat = QTextCharFormat()
+        funcFormat.setFontWeight(QFont.Bold)
         self.__rules.append((re.compile('\\b(\\w+)\(.*\):'), funcFormat))
 
         # mel warning
-        warningFormat = QtGui.QTextCharFormat()
-        warningFormat.setForeground(QtGui.QColor('#FF9ACD32'))
-        warningFormat.setBackground(QtCore.Qt.yellow)
-        warningFormat.setFontWeight(QtGui.QFont.Bold)
+        warningFormat = QTextCharFormat()
+        warningFormat.setForeground(QColor('#FF9ACD32'))
+        warningFormat.setBackground(Qt.yellow)
+        warningFormat.setFontWeight(QFont.Bold)
         self.__rules.append((re.compile('// Warning:[^\n]*//'), warningFormat))
 
         # mel error
-        errorFormat = QtGui.QTextCharFormat()
-        errorFormat.setForeground(QtGui.QColor('#FF9ACD32'))
-        errorFormat.setBackground(QtCore.Qt.red)
-        errorFormat.setFontWeight(QtGui.QFont.Bold)
+        errorFormat = QTextCharFormat()
+        errorFormat.setForeground(QColor('#FF9ACD32'))
+        errorFormat.setBackground(Qt.red)
+        errorFormat.setFontWeight(QFont.Bold)
         self.__rules.append((re.compile('// Error:[^\n]*//'), errorFormat))
 
         # Quotes
-        self._singleQuotes = QtCore.QRegExp("'''")
-        self._doubleQuotes = QtCore.QRegExp('"""')
+        self._singleQuotes = QRegExp("'''")
+        self._doubleQuotes = QRegExp('"""')
 
         # mel multi-line comment: /*  */
         self._melMLComStart = re.compile('/\\*')
@@ -184,9 +194,9 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         keywords = {}.fromkeys(melKeywords)
         keywords.update({}.fromkeys(pyKeywords))
         # keyword format
-        keywordFormat = QtGui.QTextCharFormat()
+        keywordFormat = QTextCharFormat()
         keywordFormat.setForeground(self._keywordColor)
-        keywordFormat.setFontWeight(QtGui.QFont.Bold)
+        keywordFormat.setFontWeight(QFont.Bold)
         kwtext = '\\b(' + "|".join(keywords) + ')\\b'
         self.__rules.append((re.compile(kwtext), keywordFormat))
 
@@ -221,7 +231,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
         functions = functions[:-1] + ')\\b'
 
         # function format
-        funcFormat = QtGui.QTextCharFormat()
+        funcFormat = QTextCharFormat()
         funcFormat.setForeground(self._keywordColor)
         self.__rules.append((re.compile(functions), funcFormat))
         for mp in melProc:
