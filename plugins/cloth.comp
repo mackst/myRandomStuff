@@ -1,0 +1,117 @@
+// porated from https://github.com/SaschaWillems/Vulkan/tree/master/examples/computecloth
+
+#version 450
+
+struct Particle {
+	vec4 pos;
+	vec4 vel;
+	float pinned;
+};
+
+layout(std430, binding = 0) buffer ParticleIn {
+	Particle particleIn[ ];
+};
+
+layout(std430, binding = 1) buffer ParticleOut {
+	vec4 particleOut[ ];
+};
+
+// todo: use shared memory to speed up calculation
+
+layout (local_size_x = 10, local_size_y = 10) in;
+
+layout (binding = 2) uniform UBO 
+{
+	float deltaT;
+	float particleMass;
+	float springStiffness;
+	float damping;
+	float restDistH;
+	float restDistV;
+	float restDistD;
+	float sphereRadius;
+	vec4 spherePos;
+	vec4 gravity;
+	vec4 particleCount;
+} params;
+
+vec3 springForce(vec3 p0, vec3 p1, float restDist) 
+{
+	vec3 dist = p0 - p1;
+	return normalize(dist) * params.springStiffness * (length(dist) - restDist);
+}
+
+void main()
+{
+	uvec3 id = gl_GlobalInvocationID; 
+	ivec2 particleCount = ivec2(params.particleCount.xy);
+	uint index = id.y * particleCount.x + id.x;
+	if (index > particleCount.x * particleCount.y) 
+		return;
+
+	// Pinned?
+	if (particleIn[index].pinned == 1.0) {
+		particleOut[index] = particleIn[index].pos;
+		//particleOut[index].vel = vec4(0.0);
+		particleIn[index].vel = vec4(0.0);
+		return;
+	}
+
+	// Initial force from gravity
+	vec3 force = params.gravity.xyz * params.particleMass;
+
+	vec3 pos = particleIn[index].pos.xyz;
+	vec3 vel = particleIn[index].vel.xyz;
+
+	// Spring forces from neighboring particles
+	// left
+	if (id.x > 0) {
+		force += springForce(particleIn[index-1].pos.xyz, pos, params.restDistH);
+	} 
+	// right
+	if (id.x < particleCount.x - 1) {
+		force += springForce(particleIn[index + 1].pos.xyz, pos, params.restDistH);
+	}
+	// upper
+	if (id.y < particleCount.y - 1) {
+		force += springForce(particleIn[index + particleCount.x].pos.xyz, pos, params.restDistV);
+	} 
+	// lower
+	if (id.y > 0) {
+		force += springForce(particleIn[index - particleCount.x].pos.xyz, pos, params.restDistV);
+	} 
+	// upper-left
+	if ((id.x > 0) && (id.y < particleCount.y - 1)) {
+		force += springForce(particleIn[index + particleCount.x - 1].pos.xyz, pos, params.restDistD);
+	}
+	// lower-left
+	if ((id.x > 0) && (id.y > 0)) {
+		force += springForce(particleIn[index - particleCount.x - 1].pos.xyz, pos, params.restDistD);
+	}
+	// upper-right
+	if ((id.x < particleCount.x - 1) && (id.y < particleCount.y - 1)) {
+		force += springForce(particleIn[index + particleCount.x + 1].pos.xyz, pos, params.restDistD);
+	}
+	// lower-right
+	if ((id.x < particleCount.x - 1) && (id.y > 0)) {
+		force += springForce(particleIn[index - particleCount.x + 1].pos.xyz, pos, params.restDistD);
+	}
+
+	force += (-params.damping * vel);
+
+	// Integrate
+	vec3 f = force * (1.0 / params.particleMass);
+	particleOut[index] = vec4(pos + vel * params.deltaT + 0.5 * f * params.deltaT * params.deltaT, 1.0);
+	//particleOut[index].vel = vec4(vel + f * params.deltaT, 0.0);
+	particleIn[index].vel = vec4(vel + f * params.deltaT, 0.0);
+
+	// Sphere collision
+	vec3 sphereDist = particleOut[index].xyz - params.spherePos.xyz;
+	if (length(sphereDist) < params.sphereRadius + 0.01) {
+		// If the particle is inside the sphere, push it to the outer radius
+		particleOut[index].xyz = params.spherePos.xyz + normalize(sphereDist) * (params.sphereRadius + 0.01);		
+		// Cancel out velocity
+		//particleOut[index].vel = vec4(0.0);
+		particleIn[index].vel = vec4(0.0);
+	}
+}
