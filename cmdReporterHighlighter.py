@@ -2,7 +2,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014-2018 Mack Stone
+# Copyright (c) 2014-2023 Mack Stone
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of
 # this software and associated documentation files (the "Software"), to deal in
@@ -40,19 +40,18 @@ import re
 import keyword
 
 from maya import (cmds, mel)
-from maya import OpenMayaUI as omui
+import maya.OpenMayaUI as omui
 
 try:
   from PySide2.QtCore import * 
   from PySide2.QtGui import * 
   from PySide2.QtWidgets import *
-  from PySide2 import __version__
   from shiboken2 import wrapInstance 
 except ImportError:
-  from PySide.QtCore import * 
-  from PySide.QtGui import * 
-  from PySide import __version__
-  from shiboken import wrapInstance 
+  from PySide6.QtCore import * 
+  from PySide6.QtGui import * 
+  from PySide6.QtWidgets import *
+  from shiboken6 import wrapInstance 
 
 def launchFromCmdWndIcon():
     '''launch from maya command line script editor icon.'''
@@ -77,9 +76,8 @@ def getMayaWindowWidget():
     '''get maya window widget for Qt'''
     mwin = None
     try:
-        from shiboken import wrapInstance
         mwinPtr = omui.MQtUtil.mainWindow()
-        mwin = wrapInstance(long(mwinPtr), QMainWindow)
+        mwin = wrapInstance(int(mwinPtr), QMainWindow)
     except:
         mapp = QApplication.instance()
         for widget in mapp.topLevelWidgets():
@@ -94,7 +92,7 @@ def highlightCmdReporter():
     cmdReporters = cmds.lsUI(type='cmdScrollFieldReporter')
     if not cmdReporters: return
     # only setup for the first one
-    cmdReporter = mwin.findChild(QTextEdit, cmdReporters[0])
+    cmdReporter = mwin.findChild(QWidget, cmdReporters[0])
     highlighter = Highlighter(parent=mwin)
     highlighter.setDocument(cmdReporter.document())
 
@@ -212,7 +210,7 @@ class Highlighter(QSyntaxHighlighter):
         # global MEL procedures
         melProcedures = cmds.melInfo()
         maxlen = 1400
-        stop = len(melProcedures) / maxlen
+        stop = int(len(melProcedures) / maxlen)
         melProc = []
         melProc.append('\\b(' + '|'.join(melProcedures[:maxlen]) + ')\\b')
         for i in range(1, stop - 1):
